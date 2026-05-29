@@ -609,48 +609,7 @@ svg.sparkline{overflow:visible}
 // ============================================================
 // MOCK DATA
 // ============================================================
-const LEADS = [
-  {id:1,name:"Sarah Chen",title:"VP of Marketing",company:"TechFlow AI",color:"#f027a4",heat:87,wave:1,stage:"active",seqId:1,
-   signals:{post:"Posted about AI-driven growth 2h ago",hire:"Hiring: Growth Marketing Manager",mutual:"3 mutual connections",eng:"Liked 2 of your posts"},
-   signalScores:{activity:90,hiring:75,mutual:85,engagement:95},
-   events:[{icon:"👁",label:"Viewed your profile",delta:"+8",t:"12m ago"},{icon:"❤️",label:"Liked your post",delta:"+5",t:"2h ago"}]},
-  {id:2,name:"Marcus Rivera",title:"Founder & CEO",company:"Loop Labs",color:"#7c3aed",heat:94,wave:1,stage:"active",seqId:2,
-   signals:{post:"Shared YC founder tips yesterday",hire:"Hiring full-stack engineers",mutual:"5 mutual connections",eng:"Replied to your comment"},
-   signalScores:{activity:95,hiring:80,mutual:92,engagement:88},
-   events:[{icon:"💬",label:"Replied to your comment",delta:"+15",t:"1h ago"},{icon:"📧",label:"Opened your email",delta:"+10",t:"3h ago"}]},
-  {id:3,name:"Priya Nair",title:"Head of Growth",company:"Vertex",color:"#06d6f0",heat:71,wave:2,stage:"none",seqId:null,
-   signals:{post:"Wrote about B2B SaaS funnels 4h ago",hire:"Hiring SDR team",mutual:"2 mutual connections",eng:"Follows you on Twitter"},
-   signalScores:{activity:75,hiring:70,mutual:60,engagement:72},
-   events:[{icon:"🔗",label:"Clicked your link in bio",delta:"+6",t:"4h ago"}]},
-  {id:4,name:"Jordan Kim",title:"CTO",company:"Stackr",color:"#ffb400",heat:56,wave:2,stage:"none",seqId:null,
-   signals:{post:"No recent posts (7 days)",hire:"No active hiring signals",mutual:"1 mutual connection",eng:"No recent engagement"},
-   signalScores:{activity:45,hiring:30,mutual:40,engagement:60},
-   events:[]},
-  {id:5,name:"Alex Thompson",title:"CMO",company:"Wave Commerce",color:"#00f5a0",heat:82,wave:1,stage:"active",seqId:1,
-   signals:{post:"Posted growth playbook 6h ago",hire:"Hiring: Content Strategist",mutual:"4 mutual connections",eng:"Shared your newsletter"},
-   signalScores:{activity:85,hiring:65,mutual:88,engagement:90},
-   events:[{icon:"🔄",label:"Shared your newsletter",delta:"+12",t:"6h ago"},{icon:"👁",label:"Viewed your profile",delta:"+5",t:"8h ago"}]},
-  {id:6,name:"Lena Hoffmann",title:"Growth Lead",company:"Nori",color:"#f97316",heat:63,wave:2,stage:"none",seqId:null,
-   signals:{post:"Posted on sustainability tech 1d ago",hire:"No hiring signals",mutual:"2 mutual connections",eng:"Commented on industry post"},
-   signalScores:{activity:65,hiring:20,mutual:55,engagement:68},
-   events:[{icon:"💬",label:"Commented on shared post",delta:"+4",t:"1d ago"}]},
-  {id:7,name:"Dev Patel",title:"CEO",company:"Capsule",color:"#8b5cf6",heat:91,wave:1,stage:"active",seqId:3,
-   signals:{post:"Live-tweeted product launch today",hire:"Scaling entire team",mutual:"6 mutual connections",eng:"Opened email 3x"},
-   signalScores:{activity:98,hiring:95,mutual:90,engagement:82},
-   events:[{icon:"📧",label:"Opened email 3 times",delta:"+20",t:"Today"},{icon:"🔗",label:"Clicked case study link",delta:"+15",t:"2h ago"}]},
-  {id:8,name:"Maya Foster",title:"Director of BD",company:"Orbit",color:"#ec4899",heat:78,wave:1,stage:"active",seqId:2,
-   signals:{post:"Asked for intro requests 3h ago",hire:"Hiring: Partnership Manager",mutual:"3 mutual connections",eng:"Bookmarked your content"},
-   signalScores:{activity:80,hiring:75,mutual:70,engagement:88},
-   events:[{icon:"🔖",label:"Bookmarked your post",delta:"+7",t:"3h ago"}]},
-  {id:9,name:"Carlos Mendez",title:"VP Sales",company:"Lumio",color:"#14b8a6",heat:45,wave:3,stage:"none",seqId:null,
-   signals:{post:"Posted 2 weeks ago",hire:"No hiring signals",mutual:"1 mutual connection",eng:"No engagement"},
-   signalScores:{activity:35,hiring:25,mutual:30,engagement:50},
-   events:[]},
-  {id:10,name:"Zoe Park",title:"Head of Product",company:"Flux",color:"#f43f5e",heat:88,wave:1,stage:"active",seqId:4,
-   signals:{post:"Posted product roadmap insights 1h ago",hire:"Hiring: Product Designer",mutual:"5 mutual connections",eng:"Replied to your story"},
-   signalScores:{activity:92,hiring:70,mutual:88,engagement:95},
-   events:[{icon:"💬",label:"Replied to your story",delta:"+18",t:"1h ago"},{icon:"👁",label:"Viewed your profile",delta:"+6",t:"3h ago"}]},
-];
+const LEADS = [];
 
 const SEQUENCES = [
   {id:1,name:"Cold Intro",color:"#f027a4",emoji:"🚀",desc:"First touch for new prospects",
@@ -659,19 +618,19 @@ const SEQUENCES = [
     {day:3,channel:"email",subject:"Following up, {name}",body:"Hi {name}, I sent you a LinkedIn message a few days ago re: {topic}. Given your work at {company}, I thought a quick 15-min chat could be mutually valuable. Would {day} at {time} work?"},
     {day:7,channel:"linkedin",subject:null,body:"Hey {name} — just bumping this up. No worries if the timing isn't right. Either way, your content on {topic} is great. Happy to share a resource I think you'd find useful."},
    ],
-   activeLeads:12,replyRate:18,sent:47},
+   activeLeads:0,replyRate:0,sent:0},
   {id:2,name:"Proof Bump",color:"#7c3aed",emoji:"📊",desc:"Send social proof after cold intro",
    steps:[
     {day:0,channel:"email",subject:"{name}, quick result to share",body:"Hi {name}, I wanted to share a quick win: we helped [Client] grow their {metric} by 3x in 90 days — using a similar approach to what {company} is doing. Worth a look?"},
     {day:4,channel:"linkedin",subject:null,body:"Hey {name} — shared a case study in my last email that might be relevant. Happy to break down the key levers if you want. Just say the word."},
    ],
-   activeLeads:8,replyRate:22,sent:31},
+   activeLeads:0,replyRate:0,sent:0},
   {id:3,name:"Soft Nudge",color:"#06d6f0",emoji:"🤝",desc:"Re-engage silent prospects",
    steps:[
     {day:0,channel:"linkedin",subject:null,body:"Hey {name}, I know you're busy — just want to make sure I'm not missing your reply somewhere. Still happy to connect if the timing works."},
     {day:5,channel:"email",subject:"Last note from me, {name}",body:"Hi {name}, I'll keep this brief: if there's ever a fit in the future, my door's open. Meantime I'll get out of your inbox. Would love to stay connected on LinkedIn."},
    ],
-   activeLeads:6,replyRate:14,sent:22},
+   activeLeads:0,replyRate:0,sent:0},
   {id:4,name:"Creator Collab",color:"#ffb400",emoji:"🎨",desc:"Partnership outreach for creators",
    steps:[
     {day:0,channel:"linkedin",subject:null,body:"Hey {name}! Your content about {topic} is genuinely great. We're building something in that space and would love to explore a collab. No pitch — just a conversation."},
@@ -679,7 +638,7 @@ const SEQUENCES = [
     {day:6,channel:"linkedin",subject:null,body:"Hey {name} — bumping this! Totally understand if now's not a good time. Either way I'm a big fan of your work on {topic}."},
     {day:10,channel:"email",subject:"Final note re: collab, {name}",body:"Hi {name}, last note on this. If the timing ever shifts, I'd love to revisit. Would you be open to a quick intro call in Q{quarter}?"},
    ],
-   activeLeads:4,replyRate:31,sent:18},
+   activeLeads:0,replyRate:0,sent:0},
 ];
 
 const PROOF_POINTS = [
@@ -690,30 +649,11 @@ const PROOF_POINTS = [
   {icon:"🚀",label:"2-week onboarding",body:"Average customer goes live in 2 weeks, not 2 months. No engineering required."},
 ];
 
-const ACTIVITIES = [
-  {dot:"#f027a4",text:"<strong>Marcus Rivera</strong> opened your email for the third time",time:"Just now"},
-  {dot:"#7c3aed",text:"<strong>Dev Patel</strong> clicked your case study link",time:"4m ago"},
-  {dot:"#00f5a0",text:"<strong>Zoe Park</strong> replied to your story reply",time:"12m ago"},
-  {dot:"#ffb400",text:"New lead <strong>Ryan Osei</strong> matched high-intent criteria",time:"31m ago"},
-  {dot:"#06d6f0",text:"<strong>Sarah Chen</strong> posted: 'Best AI tools for growth teams'",time:"1h ago"},
-  {dot:"#f97316",text:"Sequence <em>Cold Intro</em> hit 25% reply rate milestone",time:"2h ago"},
-  {dot:"#ec4899",text:"<strong>Maya Foster</strong> bookmarked your LinkedIn post",time:"3h ago"},
-  {dot:"#8b5cf6",text:"Weekly report: Reply rate up <strong>+4.2%</strong> vs last week",time:"4h ago"},
-];
+const ACTIVITIES = [];
 
-const FLOW_ITEMS = [
-  {id:"f1",title:"Follow up with Marcus Rivera — Day 3 email",due:"Today",done:false,lead:2},
-  {id:"f2",title:"Send Cold Intro to Jordan Kim",due:"Today",done:false,lead:4},
-  {id:"f3",title:"Review Sarah Chen's new post and engage",due:"Today",done:true,lead:1},
-  {id:"f4",title:"Soft Nudge: Carlos Mendez — final touch",due:"EOD",done:false,lead:9},
-  {id:"f5",title:"3 new high-signal prospects added to Radar",due:"Review",done:false,lead:null},
-];
+const FLOW_ITEMS = [];
 
-const RECENT_SENDS = [
-  {name:"Dev Patel",company:"Capsule",channel:"email",msg:"Hi Dev, wanted to share a quick win...",time:"2h ago",opened:true},
-  {name:"Zoe Park",company:"Flux",channel:"linkedin",msg:"Hey Zoe! Your content about product roadmaps...",time:"4h ago",opened:false},
-  {name:"Marcus Rivera",company:"Loop Labs",channel:"email",msg:"Hi Marcus, following up on my LinkedIn message...",time:"Yesterday",opened:true},
-];
+const RECENT_SENDS = [];
 
 // ============================================================
 // STATE
@@ -733,6 +673,7 @@ const state = {
   studioChannel: "linkedin",
   proofSelected: new Set(),
   recentSends: [],
+  activityFeed: [],
 };
 
 // ============================================================
@@ -780,23 +721,31 @@ function renderCommandDeck() {
 }
 
 function renderKPIs() {
+  const sent      = (state.recentSends||[]).length;
+  const warm      = state.leads.filter(l=>l.heat>=70).length;
+  const due       = state.flow.filter(f=>!f.done).length;
   const kpis = [
-    {label:"Messages Sent",value:"47",delta:"+12 today",up:true},
-    {label:"Reply Rate",value:"24%",delta:"+4.2% vs last week",up:true},
-    {label:"Warm Leads",value:"7",delta:"+3 this week",up:true},
-    {label:"Follow-ups Due",value:"5",delta:"2 overdue",up:false},
+    {label:"Messages Sent",   value: sent,              delta: sent ? "total logged" : "Send your first message",   up: sent > 0},
+    {label:"Reply Rate",      value: sent ? "—" : "0%", delta: sent ? "track replies manually" : "No sends yet",    up: false},
+    {label:"Warm Leads",      value: warm,              delta: warm ? "heat score ≥ 70" : "Import leads to start",  up: warm > 0},
+    {label:"Follow-ups Due",  value: due,               delta: due  ? `${due} pending` : "All clear",               up: false},
   ];
   document.getElementById("kpiGrid").innerHTML = kpis.map(k=>`
     <div class="kpi-card">
       <div class="kpi-label">${k.label}</div>
       <div class="kpi-value">${k.value}</div>
-      <div class="kpi-delta ${k.up?'':'down'}">${k.up?"▲":"▼"} ${k.delta}</div>
+      <div class="kpi-delta ${k.up?'':'down'}">${k.up?"▲":"–"} ${k.delta}</div>
     </div>
   `).join("");
 }
 
 function renderFlow() {
-  document.getElementById("flowList").innerHTML = state.flow.map(item=>`
+  const el = document.getElementById("flowList");
+  if(!state.flow.length){
+    el.innerHTML=`<div style="text-align:center;padding:28px 16px;color:var(--t2)"><div style="font-size:28px;margin-bottom:8px">✓</div><div style="font-size:13px">All clear — no tasks yet.<br>Follow-ups appear here automatically when you send a message.</div></div>`;
+    return;
+  }
+  el.innerHTML = state.flow.map(item=>`
     <div class="flow-item ${item.done?'done':''}" onclick="toggleFlow('${item.id}')">
       <div class="flow-check">
         <span class="flow-check-icon">✓</span>
@@ -820,7 +769,13 @@ function checkAllFlow() {
 }
 
 function renderActivityFeed() {
-  document.getElementById("activityFeed").innerHTML = ACTIVITIES.map(a=>`
+  const feed = document.getElementById("activityFeed");
+  const items = state.activityFeed || [];
+  if(!items.length){
+    feed.innerHTML=`<div style="text-align:center;padding:28px 16px;color:var(--t2)"><div style="font-size:28px;margin-bottom:8px">🔔</div><div style="font-size:13px">No activity yet.<br>Signals appear here as your leads engage.</div></div>`;
+    return;
+  }
+  feed.innerHTML = items.map(a=>`
     <div class="activity-item">
       <div class="activity-dot" style="background:${a.dot}"></div>
       <div class="activity-text">${a.text}</div>
@@ -846,10 +801,14 @@ function launchSequence(id) {
 }
 
 function renderPerfGrid() {
+  const sent  = (state.recentSends||[]).length;
+  const seqs  = state.sequences;
+  const bestSeq = seqs.length ? seqs.reduce((a,b)=>a.replyRate>b.replyRate?a:b) : null;
+  const activeSeqs = seqs.filter(s=>s.activeLeads>0).length;
   const perf = [
-    {label:"Avg. Response Time",value:"2.3 days",sub:"vs 4.1 days industry avg",color:"#f027a4"},
-    {label:"Open Rate (Email)",value:"41%",sub:"↑ 6% from last week",color:"#7c3aed"},
-    {label:"Best Performing Seq.",value:"Creator Collab",sub:"31% reply rate",color:"#ffb400"},
+    {label:"Messages Sent (total)", value: sent||"0",         sub: sent ? "tracked in DM Studio" : "Send your first message",         color:"#f027a4"},
+    {label:"Active Sequences",      value: activeSeqs||"0",   sub: activeSeqs ? `of ${seqs.length} sequences` : "Activate a sequence to start", color:"#7c3aed"},
+    {label:"Best Performing Seq.",  value: bestSeq&&bestSeq.replyRate ? bestSeq.name : "—", sub: bestSeq&&bestSeq.replyRate ? `${bestSeq.replyRate}% reply rate` : "No reply data yet", color:"#ffb400"},
   ];
   document.getElementById("perfGrid").innerHTML = perf.map(p=>`
     <div class="card" style="border-top:2px solid ${p.color}">
@@ -878,8 +837,18 @@ function renderLeadRadar() {
   });
   leads.sort((a,b)=>b.heat-a.heat);
   const list = document.getElementById("leadList");
+  if(!state.leads.length){
+    list.innerHTML=`
+      <div style="text-align:center;padding:60px 20px">
+        <div style="font-size:48px;margin-bottom:16px">📡</div>
+        <div style="font-size:18px;font-weight:700;color:var(--t0);margin-bottom:8px">No leads yet</div>
+        <div style="font-size:14px;color:var(--t1);margin-bottom:24px;max-width:380px;margin-left:auto;margin-right:auto">Import your LinkedIn connections to populate your radar. Go to <strong>Settings → Data Privacy → Get a copy of your data</strong> on LinkedIn, then upload <code style="background:var(--glass);padding:1px 6px;border-radius:4px">Connections.csv</code> below.</div>
+        <button class="btn btn-primary" onclick="openLinkedIn()">📁 Import Connections CSV</button>
+      </div>`;
+    return;
+  }
   if(!leads.length){
-    list.innerHTML=`<div class="empty-state"><div class="empty-state-icon">📡</div><p>No leads match your filters.</p></div>`;
+    list.innerHTML=`<div class="empty-state"><div class="empty-state-icon">🔍</div><p>No leads match your filters.</p></div>`;
     return;
   }
   list.innerHTML = leads.map(l=>renderLeadCard(l)).join("");
@@ -1257,6 +1226,16 @@ function renderWarmQueue() {
   else if(state.wqFilter==="warm") leads=leads.filter(l=>l.heat>=55&&l.heat<80);
   else if(state.wqFilter==="promoted") leads=leads.filter(l=>l.heat>=85);
 
+  if(!leads.length){
+    document.getElementById("warmQueue").innerHTML=`
+      <div style="text-align:center;padding:60px 20px">
+        <div style="font-size:48px;margin-bottom:16px">🔥</div>
+        <div style="font-size:18px;font-weight:700;color:var(--t0);margin-bottom:8px">Queue is empty</div>
+        <div style="font-size:14px;color:var(--t1);margin-bottom:24px">Leads heat up as they engage with your content. Import your connections to get started.</div>
+        <button class="btn btn-primary" onclick="openLinkedIn()">📁 Import Connections CSV</button>
+      </div>`;
+    return;
+  }
   document.getElementById("warmQueue").innerHTML = leads.map(l=>{
     const hc = l.heat>=80?"hot":l.heat>=55?"warm":"cool";
     const events = l.events.length
@@ -1544,54 +1523,57 @@ function simulateHeat() {
   const ev = heatEvents[Math.floor(Math.random()*heatEvents.length)];
   const bump = parseInt(ev.delta.replace("+",""));
   lead.heat = Math.min(lead.heat+bump, 99);
-  const newEvent = {...ev, t:"Just now"};
-  lead.events.unshift(newEvent);
+  lead.events.unshift({...ev, t:"Just now"});
   if(lead.events.length>4) lead.events.pop();
+  // Push to persistent activity feed
+  const colors = ["#f027a4","#7c3aed","#06d6f0","#00f5a0","#ffb400","#f97316"];
+  const c = colors[Math.floor(Math.random()*colors.length)];
+  state.activityFeed = state.activityFeed || [];
+  state.activityFeed.unshift({dot:c, text:`<strong>${lead.name}</strong> ${ev.label.toLowerCase()}`, time:"Just now"});
+  if(state.activityFeed.length>20) state.activityFeed.pop();
   if(state.view==="queue") renderWarmQueue();
   if(state.view==="radar") renderLeadRadar();
-  // Update live activity feed
-  const actFeed = document.getElementById("activityFeed");
-  if(actFeed && state.view==="deck") {
-    const colors = ["#f027a4","#7c3aed","#06d6f0","#00f5a0","#ffb400","#f97316"];
-    const c = colors[Math.floor(Math.random()*colors.length)];
-    const newRow = `<div class="activity-item"><div class="activity-dot" style="background:${c}"></div><div class="activity-text"><strong>${lead.name}</strong> ${ev.label.toLowerCase()}</div><div class="activity-time">Just now</div></div>`;
-    actFeed.innerHTML = newRow + actFeed.innerHTML.split('<div class="activity-item">').slice(0,7).map((s,i)=>i===0?"":('<div class="activity-item">'+s)).join("");
-  }
+  if(state.view==="deck") renderActivityFeed();
 }
 
 // ============================================================
 // PERSISTENCE
 // ============================================================
+const S = 'oos2_'; // bump prefix to abandon any old mock-data cache
+
 function saveState() {
   try {
-    localStorage.setItem('oos_leads',      JSON.stringify(state.leads));
-    localStorage.setItem('oos_flow',       JSON.stringify(state.flow));
-    localStorage.setItem('oos_sequences',  JSON.stringify(state.sequences));
-    localStorage.setItem('oos_sends',      JSON.stringify(state.recentSends||[]));
-    localStorage.setItem('oos_linkedin',   state.linkedIn ? '1' : '0');
+    localStorage.setItem(S+'leads',    JSON.stringify(state.leads));
+    localStorage.setItem(S+'flow',     JSON.stringify(state.flow));
+    localStorage.setItem(S+'seqs',     JSON.stringify(state.sequences));
+    localStorage.setItem(S+'sends',    JSON.stringify(state.recentSends||[]));
+    localStorage.setItem(S+'feed',     JSON.stringify(state.activityFeed||[]));
+    localStorage.setItem(S+'linkedin', state.linkedIn ? '1' : '0');
   } catch(e) {}
 }
 
 function loadState() {
   try {
-    const leads = localStorage.getItem('oos_leads');
+    const leads = localStorage.getItem(S+'leads');
     if(leads) state.leads = JSON.parse(leads);
 
-    const flow = localStorage.getItem('oos_flow');
+    const flow = localStorage.getItem(S+'flow');
     if(flow) state.flow = JSON.parse(flow);
 
-    const seqs = localStorage.getItem('oos_sequences');
+    const seqs = localStorage.getItem(S+'seqs');
     if(seqs) state.sequences = JSON.parse(seqs);
 
-    const sends = localStorage.getItem('oos_sends');
+    const sends = localStorage.getItem(S+'sends');
     if(sends) state.recentSends = JSON.parse(sends);
 
-    if(localStorage.getItem('oos_linkedin') === '1') {
+    const feed = localStorage.getItem(S+'feed');
+    if(feed) state.activityFeed = JSON.parse(feed);
+
+    if(localStorage.getItem(S+'linkedin') === '1') {
       state.linkedIn = true;
-      const count = state.leads.length - LEADS.length;
       document.getElementById("liDot").classList.add("connected");
       document.getElementById("liTitle").textContent = "LinkedIn ✓";
-      document.getElementById("liSub").textContent = count > 0 ? `${count} contacts imported` : "Connected";
+      document.getElementById("liSub").textContent = `${state.leads.length} contacts imported`;
       document.getElementById("liBtn").textContent = "Re-import CSV";
     }
   } catch(e) {}
