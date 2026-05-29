@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OutreachOS — Cold Outreach Operating System</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg0:#070b17;--bg1:#0c1024;--bg2:#111630;
+  --glass:rgba(255,255,255,0.04);--glass-h:rgba(255,255,255,0.07);
+  --gb:rgba(255,255,255,0.08);--gba:rgba(240,39,164,0.35);
+  --t0:#f0f2ff;--t1:#7b85a3;--t2:#3d4560;
+  --mag:#f027a4;--vio:#7c3aed;--cy:#06d6f0;--gr:#00f5a0;--amb:#ffb400;
+  --grad:linear-gradient(135deg,#f027a4,#7c3aed);
+  --grad-r:linear-gradient(135deg,#7c3aed,#f027a4);
+  --hot:linear-gradient(90deg,#f027a4,#ff6b2b);
+  --warm:linear-gradient(90deg,#ffb400,#ff7f00);
+  --cool:linear-gradient(90deg,#1e3a5f,#4a80b4);
+  --r:12px;--rs:8px;--rx:20px;
+  --sw:240px;
+  --sh:0 4px 24px rgba(0,0,0,.5);
+  --glow:0 0 30px rgba(240,39,164,.18);
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+
+body.y2k{
+  --bg0:#000010;--bg1:#000020;--bg2:#000030;
+  --glass:rgba(0,255,100,.04);--glass-h:rgba(0,255,100,.09);
+  --gb:#00ff44;--gba:#ff00ff;
+  --t0:#00ff44;--t1:#ff00ff;--t2:#0088ff;
+  --mag:#ff00ff;--vio:#cc00ff;--cy:#00ffff;--gr:#00ff00;--amb:#ffff00;
+  --grad:linear-gradient(135deg,#ff00ff,#00ffff);
+  --grad-r:linear-gradient(135deg,#00ffff,#ff00ff);
+  --hot:linear-gradient(90deg,#ff00ff,#ff3300);
+  --warm:linear-gradient(90deg,#ffff00,#ff9900);
+  --cool:linear-gradient(90deg,#003300,#00ff00);
+  --r:0px;--rs:0px;--rx:0px;
+  font-family:'Comic Sans MS','Comic Sans',cursive!important;
+}
+body.y2k *{font-family:'Comic Sans MS','Comic Sans',cursive!important}
+
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg0);color:var(--t0);line-height:1.5}
+
+/* STARFIELD */
+.y2k-stars{display:none;position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+body.y2k .y2k-stars{display:block}
+.y2k-stars span{position:absolute;color:#fff;font-size:10px;animation:twinkle 2s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+
+/* Y2K MARQUEE */
+.y2k-bar{display:none;background:var(--mag);color:#000;font-weight:700;padding:4px 0;text-align:center;font-size:13px;white-space:nowrap;overflow:hidden}
+body.y2k .y2k-bar{display:block}
+.y2k-bar-inner{display:inline-block;animation:marquee 14s linear infinite}
+@keyframes marquee{0%{transform:translateX(100vw)}100%{transform:translateX(-100%)}}
+
+/* BLINK */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+body.y2k .blink{animation:blink 1s step-end infinite}
+
+/* LAYOUT */
+.app{display:flex;height:100vh;position:relative;z-index:1}
+
+/* SIDEBAR */
+.sidebar{width:var(--sw);flex-shrink:0;background:var(--bg1);border-right:1px solid var(--gb);display:flex;flex-direction:column;overflow:hidden;transition:background .3s}
+.logo{padding:24px 20px 20px;border-bottom:1px solid var(--gb)}
+.logo-mark{font-size:20px;font-weight:800;letter-spacing:-.5px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo-sub{font-size:11px;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
+body.y2k .logo-mark{-webkit-text-fill-color:var(--mag);background:none}
+
+nav{padding:16px 12px;flex:1}
+.nav-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);padding:0 8px;margin:12px 0 6px}
+.nav-link{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r);color:var(--t1);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;user-select:none;border:1px solid transparent}
+.nav-link:hover{background:var(--glass-h);color:var(--t0);border-color:var(--gb)}
+.nav-link.active{background:var(--glass);color:var(--t0);border-color:var(--gba)}
+.nav-link.active .nav-icon{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+body.y2k .nav-link.active{border:2px solid var(--mag)}
+.nav-icon{font-size:16px;width:20px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--grad);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px;min-width:22px;text-align:center}
+
+.sidebar-footer{padding:16px;border-top:1px solid var(--gb)}
+.linkedin-status{background:var(--glass);border:1px solid var(--gb);border-radius:var(--r);padding:12px;cursor:pointer;transition:all .2s}
+.linkedin-status:hover{border-color:var(--gba);background:var(--glass-h)}
+.li-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.li-dot{width:8px;height:8px;border-radius:50%;background:#666;flex-shrink:0}
+.li-dot.connected{background:var(--gr);box-shadow:0 0 6px rgba(0,245,160,.5)}
+.li-title{font-size:12px;font-weight:600;color:var(--t0)}
+.li-sub{font-size:11px;color:var(--t2)}
+.li-btn{width:100%;margin-top:8px;background:var(--grad);border:none;color:#fff;font-size:12px;font-weight:600;padding:7px;border-radius:var(--rs);cursor:pointer;transition:opacity .2s}
+.li-btn:hover{opacity:.85}
+body.y2k .li-btn{border:2px solid var(--cy);border-radius:0}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;gap:16px;padding:16px 28px;border-bottom:1px solid var(--gb);background:var(--bg0);flex-shrink:0}
+.page-title{font-size:22px;font-weight:800;letter-spacing:-.5px;flex:1}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.y2k-toggle{background:var(--glass);border:1px solid var(--gb);color:var(--t1);padding:7px 14px;border-radius:var(--rx);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.y2k-toggle:hover{border-color:var(--gba);color:var(--t0)}
+body.y2k .y2k-toggle{border:2px solid var(--mag);color:var(--mag);animation:blink 1s step-end infinite}
+.avatar-btn{width:36px;height:36px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;border:none;color:#fff}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:28px;position:relative}
+.content::-webkit-scrollbar{width:6px}
+.content::-webkit-scrollbar-track{background:transparent}
+.content::-webkit-scrollbar-thumb{background:var(--gb);border-radius:3px}
+
+/* VIEWS */
+.view{display:none}
+.view.active{display:block}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.section-title{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.section-sub{font-size:13px;color:var(--t1);margin-top:2px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap}
+.filter-chip{background:var(--glass);border:1px solid var(--gb);color:var(--t1);padding:6px 12px;border-radius:var(--rx);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.filter-chip:hover,.filter-chip.on{background:var(--glass-h);border-color:var(--gba);color:var(--t0)}
+.filter-chip.on{color:var(--mag)}
+body.y2k .filter-chip{border-color:var(--cy);border-radius:0}
+body.y2k .filter-chip.on{border-color:var(--mag);color:var(--mag)}
+
+/* CARDS */
+.card{background:var(--glass);border:1px solid var(--gb);border-radius:var(--r);padding:20px;transition:all .2s;backdrop-filter:blur(12px)}
+.card:hover{background:var(--glass-h);border-color:rgba(255,255,255,.14)}
+body.y2k .card{border:2px solid var(--gb);border-radius:0;backdrop-filter:none}
+body.y2k .card:hover{border-color:var(--mag);box-shadow:0 0 12px var(--mag)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;border:none}
+.btn-primary{background:var(--grad);color:#fff}
+.btn-primary:hover{opacity:.85;transform:translateY(-1px)}
+.btn-ghost{background:var(--glass);border:1px solid var(--gb);color:var(--t1)}
+.btn-ghost:hover{border-color:var(--gba);color:var(--t0);background:var(--glass-h)}
+.btn-sm{padding:5px 11px;font-size:12px}
+body.y2k .btn{border-radius:0;border:2px solid var(--mag)!important}
+body.y2k .btn-primary{background:var(--mag)!important;color:#000}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+
+/* KPI CARDS */
+.kpi-card{background:var(--glass);border:1px solid var(--gb);border-radius:var(--r);padding:20px 24px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
+body.y2k .kpi-card::before{height:4px;background:var(--mag)}
+.kpi-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:8px}
+.kpi-value{font-size:36px;font-weight:800;letter-spacing:-1.5px;color:var(--t0);font-variant-numeric:tabular-nums;line-height:1}
+.kpi-delta{font-size:12px;color:var(--gr);margin-top:6px;font-weight:600}
+.kpi-delta.down{color:#ff4444}
+body.y2k .kpi-value{color:var(--mag);text-shadow:0 0 10px var(--mag)}
+
+/* HEAT BARS */
+.heat-bar-wrap{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;flex:1}
+.heat-bar{height:100%;border-radius:3px;transition:width .6s ease}
+.heat-bar.hot{background:var(--hot)}
+.heat-bar.warm{background:var(--warm)}
+.heat-bar.cool{background:var(--cool)}
+body.y2k .heat-bar-wrap{border:1px solid var(--gb);border-radius:0}
+body.y2k .heat-bar.hot{background:var(--hot)}
+
+/* HEAT SCORE */
+.heat-score{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1px;line-height:1}
+.heat-score.hot{color:var(--mag)}
+.heat-score.warm{color:var(--amb)}
+.heat-score.cool{color:var(--cy)}
+body.y2k .heat-score.hot{text-shadow:0 0 8px var(--mag)}
+
+/* SIGNAL CHIPS */
+.signal-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:var(--rx);font-size:11px;font-weight:600;border:1px solid}
+.signal-post{background:rgba(240,39,164,.12);border-color:rgba(240,39,164,.3);color:var(--mag)}
+.signal-hire{background:rgba(0,245,160,.08);border-color:rgba(0,245,160,.25);color:var(--gr)}
+.signal-mutual{background:rgba(6,214,240,.08);border-color:rgba(6,214,240,.25);color:var(--cy)}
+.signal-eng{background:rgba(255,180,0,.08);border-color:rgba(255,180,0,.25);color:var(--amb)}
+
+/* LEAD CARDS */
+.lead-card{background:var(--glass);border:1px solid var(--gb);border-radius:var(--r);padding:20px;display:flex;gap:16px;transition:all .2s;cursor:pointer}
+.lead-card:hover{background:var(--glass-h);border-color:rgba(255,255,255,.14);transform:translateY(-1px);box-shadow:var(--sh)}
+.lead-card.selected{border-color:var(--gba);box-shadow:var(--glow)}
+body.y2k .lead-card{border:2px solid var(--gb);border-radius:0}
+body.y2k .lead-card:hover{border-color:var(--mag)}
+body.y2k .lead-card.selected{border:2px solid var(--mag);box-shadow:0 0 12px var(--mag)}
+.lead-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;color:#fff}
+.lead-info{flex:1;min-width:0}
+.lead-name{font-size:15px;font-weight:700;color:var(--t0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lead-meta{font-size:12px;color:var(--t1);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lead-signals{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.lead-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.signal-bars{display:flex;flex-direction:column;gap:5px;margin-top:10px}
+.signal-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t1)}
+.signal-row-label{width:70px;flex-shrink:0;text-align:right}
+
+/* SEQUENCE CARDS */
+.seq-card{background:var(--glass);border:1px solid var(--gb);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;border-left:3px solid transparent}
+.seq-card:hover{background:var(--glass-h)}
+.seq-card.active-seq{border-left-color:var(--mag)}
+body.y2k .seq-card{border:2px solid var(--gb);border-radius:0}
+.seq-name{font-size:14px;font-weight:700;margin-bottom:4px}
+.seq-stats{display:flex;gap:12px;font-size:12px;color:var(--t1);margin-top:8px}
+.seq-stat-val{font-weight:700;color:var(--t0);font-variant-numeric:tabular-nums}
+
+/* SEQUENCE TIMELINE */
+.seq-timeline{position:relative;padding-left:28px}
+.seq-step{position:relative;margin-bottom:24px}
+.seq-step::before{content:'';position:absolute;left:-20px;top:14px;bottom:-24px;width:1px;background:var(--gb)}
+.seq-step:last-child::before{display:none}
+.seq-step-dot{position:absolute;left:-25px;top:8px;width:10px;height:10px;border-radius:50%;background:var(--grad);border:2px solid var(--bg1);box-shadow:0 0 0 2px var(--mag)}
+body.y2k .seq-step-dot{border-radius:0;background:var(--mag)}
+.seq-step-card{background:var(--glass);border:1px solid var(--gb);border-radius:var(--r);padding:14px 16px}
+body.y2k .seq-step-card{border:2px solid var(--gb);border-radius:0}
+.step-meta{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.step-day{font-size:11px;background:var(--glass);border:1px solid var(--gb);padding:2px 8px;border-radius:var(--rx);color:var(--t1);font-weight:600}
+.step-channel{font-size:11px;font-weight:700;padding:2px 8px;border-radius:var(--rx)}
+.step-channel.email{background:rgba(6,214,240,.15);color:var(--cy)}
+.step-channel.linkedin{background:rgba(124,58,237,.15);color:#a78bfa}
+.step-preview{font-size:13px;color:var(--t1);line-height:1.5}
+
+/* DM STUDIO */
+.studio-layout{display:grid;grid-template-columns:1fr 1.6fr;gap:24px;align-items:start}
+.studio-panel{background:var(--glass);border:1px solid var(--gb);border-radius:var(--r);padding:20px}
+body.y2k .studio-panel{border:2px solid var(--gb);border-radius:0}
+.studio-panel-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin-bottom:16px}
+.proof-point{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--glass);border:1px solid var(--gb);border-radius:var(--rs);margin-bottom:8px;cursor:pointer;transition:all .15s}
+.proof-point:hover,.proof-point.selected{border-color:var(--gba);background:var(--glass-h)}
+.proof-point.selected{border-color:var(--mag)}
+.proof-point p{font-size:12px;color:var(--t1);line-height:1.4}
+.proof-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.tone-row{display:flex;gap:8px;margin-bottom:16px}
+.tone-btn{flex:1;padding:8px;border-radius:var(--rs);border:1px solid var(--gb);background:var(--glass);color:var(--t1);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center}
+.tone-btn:hover,.tone-btn.active{border-color:var(--gba);color:var(--mag);background:var(--glass-h)}
+body.y2k .tone-btn{border-color:var(--cy);border-radius:0}
+body.y2k .tone-btn.active{border-color:var(--mag);color:var(--mag)}
+.msg-editor{width:100%;min-height:180px;background:rgba(255,255,255,.03);border:1px solid var(--gb);border-radius:var(--rs);color:var(--t0);font-size:14px;line-height:1.6;padding:14px 16px;resize:vertical;font-family:inherit;outline:none;transition:border-color .2s}
+.msg-editor:focus{border-color:var(--gba)}
+body.y2k .msg-editor{border-color:var(--cy);border-radius:0;background:#000020;color:var(--t0)}
+.char-count{font-size:11px;color:var(--t2);text-align:right;margin-top:6px}
+.char-count.over{color:#ff4444}
+
+/* WARM QUEUE */
+.wq-card{background:var(--glass);border:1px solid var(--gb);border-radius:var(--r);padding:18px 20px;margin-bottom:12px;transition:all .2s}
+body.y2k .wq-card{border:2px solid var(--gb);border-radius:0}
+.wq-row{display:flex;align-items:center;gap:16px}
+.wq-heat-block{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;width:52px}
+.wq-score-label{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em}
+.heat-pulse{animation:heatPulse 2s ease-in-out infinite}
+@keyframes heatPulse{0%,100%{filter:drop-shadow(0 0 4px var(--mag))}50%{filter:drop-shadow(0 0 12px var(--mag))}}
+.wq-activity{font-size:12px;color:var(--t1);margin-top:10px;padding-top:10px;border-top:1px solid var(--gb)}
+.wq-event{display:inline-flex;align-items:center;gap:5px;margin-right:12px;margin-bottom:4px}
+.wq-event-icon{font-size:13px}
+.heat-change{font-size:11px;font-weight:700;padding:1px 6px;border-radius:var(--rx);margin-left:4px}
+.heat-change.up{background:rgba(240,39,164,.15);color:var(--mag)}
+.heat-change.dn{background:rgba(74,82,112,.2);color:var(--t1)}
+.promote-badge{background:var(--grad);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:var(--rx);animation:heatPulse 2s ease-in-out infinite}
+
+/* TODAY'S FLOW */
+.flow-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--glass);border:1px solid var(--gb);border-radius:var(--rs);margin-bottom:8px;cursor:pointer;transition:all .15s}
+.flow-item:hover{background:var(--glass-h);border-color:rgba(255,255,255,.14)}
+.flow-item.done{opacity:.4}
+.flow-item.done .flow-title{text-decoration:line-through}
+.flow-check{width:18px;height:18px;border-radius:4px;border:2px solid var(--gb);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.flow-item.done .flow-check{background:var(--grad);border-color:transparent}
+.flow-check-icon{font-size:11px;color:#fff;display:none}
+.flow-item.done .flow-check-icon{display:block}
+.flow-title{font-size:13px;font-weight:600;color:var(--t0);flex:1}
+.flow-due{font-size:11px;color:var(--t2);flex-shrink:0}
+
+/* SEQUENCE CHIPS */
+.chip-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+.seq-chip{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--glass);border:1px solid var(--gb);border-radius:var(--r);cursor:pointer;transition:all .2s;font-size:13px;font-weight:600;color:var(--t0)}
+.seq-chip:hover{background:var(--glass-h);transform:translateY(-2px);box-shadow:var(--sh)}
+.seq-chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+body.y2k .seq-chip{border-color:var(--cy);border-radius:0}
+body.y2k .seq-chip:hover{border-color:var(--mag)}
+
+/* ACTIVITY FEED */
+.activity-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--gb)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.activity-text{font-size:12px;color:var(--t1);line-height:1.4;flex:1}
+.activity-text strong{color:var(--t0);font-weight:600}
+.activity-time{font-size:11px;color:var(--t2);flex-shrink:0}
+
+/* SPARKLINE */
+.sparkline-wrap{height:40px;margin:8px 0}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--gb);border-radius:var(--r);padding:32px;width:420px;max-width:95vw;position:relative}
+body.y2k .modal{border:3px solid var(--mag);border-radius:0;background:#000020}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--t1);font-size:20px;cursor:pointer;padding:4px;line-height:1}
+.modal-close:hover{color:var(--t0)}
+.li-oauth-logo{text-align:center;margin-bottom:20px}
+.li-oauth-logo svg{width:100px;height:auto}
+.li-form{display:flex;flex-direction:column;gap:12px}
+.li-input{background:rgba(255,255,255,.06);border:1px solid var(--gb);border-radius:var(--rs);color:var(--t0);font-size:14px;padding:10px 14px;outline:none;transition:border-color .2s}
+.li-input:focus{border-color:var(--gba)}
+.li-authorize-btn{background:var(--grad);border:none;color:#fff;font-size:15px;font-weight:700;padding:12px;border-radius:var(--rs);cursor:pointer;transition:opacity .2s;width:100%}
+.li-authorize-btn:hover{opacity:.85}
+.li-sync-status{text-align:center;padding:20px 0}
+.progress-bar-wrap{height:4px;background:rgba(255,255,255,.06);border-radius:2px;margin:16px 0}
+.progress-bar{height:100%;border-radius:2px;background:var(--grad);transition:width .3s ease}
+
+/* RESPONSIVE ADJUSTMENTS */
+.lead-list{display:flex;flex-direction:column;gap:12px}
+
+/* INPUT / SELECT */
+select,input[type=text],input[type=email]{
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--gb);
+  border-radius:var(--rs);
+  color:var(--t0);
+  font-size:13px;
+  padding:8px 12px;
+  outline:none;
+  transition:border-color .2s;
+  font-family:inherit;
+}
+select:focus,input:focus{border-color:var(--gba)}
+body.y2k select,body.y2k input{border-color:var(--cy);border-radius:0;background:#000020;color:var(--t0)}
+select option{background:var(--bg1)}
+
+/* SCROLLBAR */
+body.y2k .content::-webkit-scrollbar-thumb{background:var(--mag)}
+
+/* TOOLTIP */
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--gb);color:var(--t0);font-size:11px;padding:4px 8px;border-radius:var(--rs);white-space:nowrap;pointer-events:none;z-index:10}
+
+/* DIVIDER */
+.divider{border:none;border-top:1px solid var(--gb);margin:20px 0}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:var(--t1)}
+.empty-state-icon{font-size:48px;margin-bottom:16px;opacity:.4}
+.empty-state p{font-size:14px;opacity:.6}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--gba);border-radius:var(--r);padding:14px 20px;font-size:13px;font-weight:500;color:var(--t0);z-index:200;box-shadow:var(--sh);transform:translateY(80px);opacity:0;transition:all .3s;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+body.y2k .toast{border:2px solid var(--mag);border-radius:0;background:#000020}
+
+/* WAVE BADGES */
+.wave-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--rx);text-transform:uppercase;letter-spacing:.04em}
+.wave-1{background:rgba(240,39,164,.15);color:var(--mag)}
+.wave-2{background:rgba(124,58,237,.15);color:#a78bfa}
+.wave-3{background:rgba(6,214,240,.15);color:var(--cy)}
+
+/* MINI SPARKLINE SVG */
+svg.sparkline{overflow:visible}
+</style>
+</head>
+<body>
+
+<!-- Y2K Starfield -->
+<div class="y2k-stars" id="y2kStars"></div>
+
+<!-- Y2K Marquee -->
+<div class="y2k-bar"><span class="y2k-bar-inner">★ WELCOME TO OUTREACHOS 2.0 ★ THE HOTTEST COLD OUTREACH TOOL ON THE INTERNET ★ YOU HAVE 7 NEW HOT LEADS ★ REPLY RATE: 24% ★ POWERED BY Y2K TECHNOLOGY ★ BEST VIEWED IN NETSCAPE NAVIGATOR ★ DO NOT CLICK HERE ← ★ &nbsp;&nbsp;&nbsp;</span></div>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark blink">OutreachOS</div>
+      <div class="logo-sub">Cold Outreach Operating System</div>
+    </div>
+    <nav>
+      <div class="nav-label">Workspace</div>
+      <div class="nav-link active" data-view="deck">
+        <span class="nav-icon">⚡</span> Command Deck
+        <span class="nav-badge" id="badge-deck">5</span>
+      </div>
+      <div class="nav-link" data-view="radar">
+        <span class="nav-icon">📡</span> Lead Radar
+        <span class="nav-badge" id="badge-radar">10</span>
+      </div>
+      <div class="nav-link" data-view="lab">
+        <span class="nav-icon">🧪</span> Sequence Lab
+      </div>
+      <div class="nav-link" data-view="studio">
+        <span class="nav-icon">✍️</span> DM Studio
+      </div>
+      <div class="nav-link" data-view="queue">
+        <span class="nav-icon">🔥</span> Warm Queue
+        <span class="nav-badge" id="badge-queue">3</span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="linkedin-status" id="linkedinConnector" onclick="openLinkedIn()">
+        <div class="li-header">
+          <div class="li-dot" id="liDot"></div>
+          <span class="li-title" id="liTitle">LinkedIn</span>
+        </div>
+        <div class="li-sub" id="liSub">Click to connect & sync prospects</div>
+        <button class="li-btn" id="liBtn">Import Connections CSV</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <span class="page-title" id="pageTitle">⚡ Command Deck</span>
+      <div class="topbar-right">
+        <button class="y2k-toggle" id="y2kBtn" onclick="toggleY2K()">✦ Y2K Mode</button>
+        <button class="avatar-btn" title="Profile">AB</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ===== COMMAND DECK ===== -->
+      <div class="view active" id="view-deck">
+        <div class="grid-4" style="margin-bottom:24px" id="kpiGrid"></div>
+
+        <div class="grid-2" style="margin-bottom:28px">
+          <div>
+            <div class="section-header">
+              <div>
+                <div class="section-title">Today's Flow</div>
+                <div class="section-sub">5 actions to close before EOD</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="checkAllFlow()">Clear done</button>
+            </div>
+            <div id="flowList"></div>
+          </div>
+          <div>
+            <div class="section-header" style="margin-bottom:16px">
+              <div>
+                <div class="section-title">Activity Feed</div>
+                <div class="section-sub">Live signal updates</div>
+              </div>
+            </div>
+            <div class="card" style="padding:16px" id="activityFeed"></div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div>
+            <div class="section-title">Quick-Launch Sequences</div>
+            <div class="section-sub">Start a sequence instantly</div>
+          </div>
+        </div>
+        <div class="chip-row" id="quickChips"></div>
+
+        <div class="section-header" style="margin-top:8px">
+          <div>
+            <div class="section-title">Performance Overview</div>
+            <div class="section-sub">Last 7 days</div>
+          </div>
+        </div>
+        <div class="grid-3" id="perfGrid"></div>
+      </div>
+
+      <!-- ===== LEAD RADAR ===== -->
+      <div class="view" id="view-radar">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Lead Radar</div>
+            <div class="section-sub">Ranked by live signal strength</div>
+          </div>
+          <div class="topbar-right" style="gap:8px">
+            <input type="text" id="leadSearch" placeholder="Search leads..." oninput="filterLeads()" style="width:180px">
+            <button class="btn btn-primary btn-sm" onclick="openLinkedIn()">+ Sync LinkedIn</button>
+          </div>
+        </div>
+
+        <div class="filter-row" style="margin-bottom:20px">
+          <span style="font-size:12px;color:var(--t2);padding:6px 4px;align-self:center">Signal:</span>
+          <div class="filter-chip on" data-filter="sig" data-val="all" onclick="setFilter('sig',this)">All</div>
+          <div class="filter-chip" data-filter="sig" data-val="high" onclick="setFilter('sig',this)">High 70+</div>
+          <div class="filter-chip" data-filter="sig" data-val="mid" onclick="setFilter('sig',this)">Mid 40–70</div>
+          <div class="filter-chip" data-filter="sig" data-val="low" onclick="setFilter('sig',this)">Low &lt;40</div>
+          <span style="font-size:12px;color:var(--t2);padding:6px 8px;align-self:center">Stage:</span>
+          <div class="filter-chip on" data-filter="stage" data-val="all" onclick="setFilter('stage',this)">All</div>
+          <div class="filter-chip" data-filter="stage" data-val="none" onclick="setFilter('stage',this)">Not Started</div>
+          <div class="filter-chip" data-filter="stage" data-val="active" onclick="setFilter('stage',this)">Active</div>
+          <span style="font-size:12px;color:var(--t2);padding:6px 8px;align-self:center">Wave:</span>
+          <div class="filter-chip on" data-filter="wave" data-val="all" onclick="setFilter('wave',this)">All</div>
+          <div class="filter-chip" data-filter="wave" data-val="1" onclick="setFilter('wave',this)">Wave 1</div>
+          <div class="filter-chip" data-filter="wave" data-val="2" onclick="setFilter('wave',this)">Wave 2</div>
+          <div class="filter-chip" data-filter="wave" data-val="3" onclick="setFilter('wave',this)">Wave 3</div>
+        </div>
+
+        <div class="lead-list" id="leadList"></div>
+      </div>
+
+      <!-- ===== SEQUENCE LAB ===== -->
+      <div class="view" id="view-lab">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Sequence Lab</div>
+            <div class="section-sub">Build multi-step outreach cadences</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="newSequence()">+ New Sequence</button>
+        </div>
+        <div class="grid-2" style="align-items:start">
+          <div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:12px">Your Sequences</div>
+            <div id="seqList"></div>
+          </div>
+          <div>
+            <div id="seqDetail" style="position:sticky;top:0"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== DM STUDIO ===== -->
+      <div class="view" id="view-studio">
+        <div class="section-header">
+          <div>
+            <div class="section-title">DM Studio</div>
+            <div class="section-sub">Craft signal-powered personalized messages</div>
+          </div>
+        </div>
+        <div class="studio-layout">
+          <div>
+            <!-- Lead Picker -->
+            <div class="studio-panel" style="margin-bottom:16px">
+              <div class="studio-panel-title">Select Lead</div>
+              <select id="studioLeadPicker" onchange="updateStudio()" style="width:100%;margin-bottom:14px">
+                <option value="">— Choose a lead —</option>
+              </select>
+              <div id="studioLeadSignals"></div>
+            </div>
+
+            <!-- Proof Points -->
+            <div class="studio-panel">
+              <div class="studio-panel-title">Proof Points</div>
+              <div id="proofPoints"></div>
+            </div>
+          </div>
+
+          <div>
+            <!-- Message Editor -->
+            <div class="studio-panel">
+              <div class="studio-panel-title">Compose Message</div>
+              <div class="tone-row" id="toneRow">
+                <button class="tone-btn active" data-tone="professional" onclick="setTone(this)">Professional</button>
+                <button class="tone-btn" data-tone="casual" onclick="setTone(this)">Casual</button>
+                <button class="tone-btn" data-tone="direct" onclick="setTone(this)">Direct</button>
+                <button class="tone-btn" data-tone="playful" onclick="setTone(this)">Playful</button>
+              </div>
+              <div style="display:flex;gap:8px;margin-bottom:12px">
+                <select id="channelPicker" onchange="generateMessage()" style="flex:1">
+                  <option value="linkedin">LinkedIn DM</option>
+                  <option value="email">Email</option>
+                </select>
+                <button class="btn btn-ghost btn-sm" onclick="generateMessage()">✨ Generate</button>
+                <button class="btn btn-primary btn-sm" onclick="copyMessage()">Copy</button>
+              </div>
+              <textarea class="msg-editor" id="msgEditor" placeholder="Select a lead and click Generate, or write your own message..." oninput="updateCharCount()"></textarea>
+              <div class="char-count" id="charCount">0 characters</div>
+              <div style="display:flex;gap:8px;margin-top:14px">
+                <button class="btn btn-ghost btn-sm" onclick="addToSequence()" style="flex:1">Add to Sequence</button>
+                <button class="btn btn-primary btn-sm" onclick="sendOnLinkedIn()" style="flex:1">💼 Open on LinkedIn</button>
+              </div>
+            </div>
+
+            <!-- Send History -->
+            <div class="studio-panel" style="margin-top:16px">
+              <div class="studio-panel-title">Recent Sends</div>
+              <div id="recentSends"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== WARM QUEUE ===== -->
+      <div class="view" id="view-queue">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Warm Queue</div>
+            <div class="section-sub">Leads heating up — auto-ranked by signal velocity</div>
+          </div>
+          <div class="filter-row">
+            <div class="filter-chip on" data-filter="wq" data-val="all" onclick="setWqFilter('all',this)">All</div>
+            <div class="filter-chip" data-filter="wq" data-val="hot" onclick="setWqFilter('hot',this)">🔥 Hot</div>
+            <div class="filter-chip" data-filter="wq" data-val="warm" onclick="setWqFilter('warm',this)">🌡 Warm</div>
+            <div class="filter-chip" data-filter="wq" data-val="promoted" onclick="setWqFilter('promoted',this)">⬆ Promoted</div>
+          </div>
+        </div>
+        <div id="warmQueue"></div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- LINKEDIN MODAL -->
+<div class="modal-overlay" id="liModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeLinkedIn()">✕</button>
+    <div id="liModalContent"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// MOCK DATA
+// ============================================================
+const LEADS = [
+  {id:1,name:"Sarah Chen",title:"VP of Marketing",company:"TechFlow AI",color:"#f027a4",heat:87,wave:1,stage:"active",seqId:1,
+   signals:{post:"Posted about AI-driven growth 2h ago",hire:"Hiring: Growth Marketing Manager",mutual:"3 mutual connections",eng:"Liked 2 of your posts"},
+   signalScores:{activity:90,hiring:75,mutual:85,engagement:95},
+   events:[{icon:"👁",label:"Viewed your profile",delta:"+8",t:"12m ago"},{icon:"❤️",label:"Liked your post",delta:"+5",t:"2h ago"}]},
+  {id:2,name:"Marcus Rivera",title:"Founder & CEO",company:"Loop Labs",color:"#7c3aed",heat:94,wave:1,stage:"active",seqId:2,
+   signals:{post:"Shared YC founder tips yesterday",hire:"Hiring full-stack engineers",mutual:"5 mutual connections",eng:"Replied to your comment"},
+   signalScores:{activity:95,hiring:80,mutual:92,engagement:88},
+   events:[{icon:"💬",label:"Replied to your comment",delta:"+15",t:"1h ago"},{icon:"📧",label:"Opened your email",delta:"+10",t:"3h ago"}]},
+  {id:3,name:"Priya Nair",title:"Head of Growth",company:"Vertex",color:"#06d6f0",heat:71,wave:2,stage:"none",seqId:null,
+   signals:{post:"Wrote about B2B SaaS funnels 4h ago",hire:"Hiring SDR team",mutual:"2 mutual connections",eng:"Follows you on Twitter"},
+   signalScores:{activity:75,hiring:70,mutual:60,engagement:72},
+   events:[{icon:"🔗",label:"Clicked your link in bio",delta:"+6",t:"4h ago"}]},
+  {id:4,name:"Jordan Kim",title:"CTO",company:"Stackr",color:"#ffb400",heat:56,wave:2,stage:"none",seqId:null,
+   signals:{post:"No recent posts (7 days)",hire:"No active hiring signals",mutual:"1 mutual connection",eng:"No recent engagement"},
+   signalScores:{activity:45,hiring:30,mutual:40,engagement:60},
+   events:[]},
+  {id:5,name:"Alex Thompson",title:"CMO",company:"Wave Commerce",color:"#00f5a0",heat:82,wave:1,stage:"active",seqId:1,
+   signals:{post:"Posted growth playbook 6h ago",hire:"Hiring: Content Strategist",mutual:"4 mutual connections",eng:"Shared your newsletter"},
+   signalScores:{activity:85,hiring:65,mutual:88,engagement:90},
+   events:[{icon:"🔄",label:"Shared your newsletter",delta:"+12",t:"6h ago"},{icon:"👁",label:"Viewed your profile",delta:"+5",t:"8h ago"}]},
+  {id:6,name:"Lena Hoffmann",title:"Growth Lead",company:"Nori",color:"#f97316",heat:63,wave:2,stage:"none",seqId:null,
+   signals:{post:"Posted on sustainability tech 1d ago",hire:"No hiring signals",mutual:"2 mutual connections",eng:"Commented on industry post"},
+   signalScores:{activity:65,hiring:20,mutual:55,engagement:68},
+   events:[{icon:"💬",label:"Commented on shared post",delta:"+4",t:"1d ago"}]},
+  {id:7,name:"Dev Patel",title:"CEO",company:"Capsule",color:"#8b5cf6",heat:91,wave:1,stage:"active",seqId:3,
+   signals:{post:"Live-tweeted product launch today",hire:"Scaling entire team",mutual:"6 mutual connections",eng:"Opened email 3x"},
+   signalScores:{activity:98,hiring:95,mutual:90,engagement:82},
+   events:[{icon:"📧",label:"Opened email 3 times",delta:"+20",t:"Today"},{icon:"🔗",label:"Clicked case study link",delta:"+15",t:"2h ago"}]},
+  {id:8,name:"Maya Foster",title:"Director of BD",company:"Orbit",color:"#ec4899",heat:78,wave:1,stage:"active",seqId:2,
+   signals:{post:"Asked for intro requests 3h ago",hire:"Hiring: Partnership Manager",mutual:"3 mutual connections",eng:"Bookmarked your content"},
+   signalScores:{activity:80,hiring:75,mutual:70,engagement:88},
+   events:[{icon:"🔖",label:"Bookmarked your post",delta:"+7",t:"3h ago"}]},
+  {id:9,name:"Carlos Mendez",title:"VP Sales",company:"Lumio",color:"#14b8a6",heat:45,wave:3,stage:"none",seqId:null,
+   signals:{post:"Posted 2 weeks ago",hire:"No hiring signals",mutual:"1 mutual connection",eng:"No engagement"},
+   signalScores:{activity:35,hiring:25,mutual:30,engagement:50},
+   events:[]},
+  {id:10,name:"Zoe Park",title:"Head of Product",company:"Flux",color:"#f43f5e",heat:88,wave:1,stage:"active",seqId:4,
+   signals:{post:"Posted product roadmap insights 1h ago",hire:"Hiring: Product Designer",mutual:"5 mutual connections",eng:"Replied to your story"},
+   signalScores:{activity:92,hiring:70,mutual:88,engagement:95},
+   events:[{icon:"💬",label:"Replied to your story",delta:"+18",t:"1h ago"},{icon:"👁",label:"Viewed your profile",delta:"+6",t:"3h ago"}]},
+];
+
+const SEQUENCES = [
+  {id:1,name:"Cold Intro",color:"#f027a4",emoji:"🚀",desc:"First touch for new prospects",
+   steps:[
+    {day:0,channel:"linkedin",subject:null,body:"Hey {name}, I noticed your post about {topic} — super relevant to what we're building. Would love your perspective on something quick."},
+    {day:3,channel:"email",subject:"Following up, {name}",body:"Hi {name}, I sent you a LinkedIn message a few days ago re: {topic}. Given your work at {company}, I thought a quick 15-min chat could be mutually valuable. Would {day} at {time} work?"},
+    {day:7,channel:"linkedin",subject:null,body:"Hey {name} — just bumping this up. No worries if the timing isn't right. Either way, your content on {topic} is great. Happy to share a resource I think you'd find useful."},
+   ],
+   activeLeads:12,replyRate:18,sent:47},
+  {id:2,name:"Proof Bump",color:"#7c3aed",emoji:"📊",desc:"Send social proof after cold intro",
+   steps:[
+    {day:0,channel:"email",subject:"{name}, quick result to share",body:"Hi {name}, I wanted to share a quick win: we helped [Client] grow their {metric} by 3x in 90 days — using a similar approach to what {company} is doing. Worth a look?"},
+    {day:4,channel:"linkedin",subject:null,body:"Hey {name} — shared a case study in my last email that might be relevant. Happy to break down the key levers if you want. Just say the word."},
+   ],
+   activeLeads:8,replyRate:22,sent:31},
+  {id:3,name:"Soft Nudge",color:"#06d6f0",emoji:"🤝",desc:"Re-engage silent prospects",
+   steps:[
+    {day:0,channel:"linkedin",subject:null,body:"Hey {name}, I know you're busy — just want to make sure I'm not missing your reply somewhere. Still happy to connect if the timing works."},
+    {day:5,channel:"email",subject:"Last note from me, {name}",body:"Hi {name}, I'll keep this brief: if there's ever a fit in the future, my door's open. Meantime I'll get out of your inbox. Would love to stay connected on LinkedIn."},
+   ],
+   activeLeads:6,replyRate:14,sent:22},
+  {id:4,name:"Creator Collab",color:"#ffb400",emoji:"🎨",desc:"Partnership outreach for creators",
+   steps:[
+    {day:0,channel:"linkedin",subject:null,body:"Hey {name}! Your content about {topic} is genuinely great. We're building something in that space and would love to explore a collab. No pitch — just a conversation."},
+    {day:3,channel:"email",subject:"Collab idea for {name}",body:"Hi {name}, following up on my LinkedIn message! Here's the brief: [collab idea]. Your audience + our [product] could be a great fit. 20 min to explore?"},
+    {day:6,channel:"linkedin",subject:null,body:"Hey {name} — bumping this! Totally understand if now's not a good time. Either way I'm a big fan of your work on {topic}."},
+    {day:10,channel:"email",subject:"Final note re: collab, {name}",body:"Hi {name}, last note on this. If the timing ever shifts, I'd love to revisit. Would you be open to a quick intro call in Q{quarter}?"},
+   ],
+   activeLeads:4,replyRate:31,sent:18},
+];
+
+const PROOF_POINTS = [
+  {icon:"📈",label:"3x growth result",body:"Helped [Client A] grow qualified pipeline 3x in 90 days using a 3-step personalization framework."},
+  {icon:"🏆",label:"#1 feature launch",body:"Our platform was featured as the #1 Product Hunt launch of the week with 2,400+ upvotes."},
+  {icon:"💼",label:"50+ enterprise logos",body:"Trusted by 50+ enterprise teams including [Name-drop 1], [Name-drop 2], and [Name-drop 3]."},
+  {icon:"⭐",label:"4.9 G2 rating",body:"4.9/5 on G2 across 180+ reviews — highest rated in the category for 3 consecutive quarters."},
+  {icon:"🚀",label:"2-week onboarding",body:"Average customer goes live in 2 weeks, not 2 months. No engineering required."},
+];
+
+const ACTIVITIES = [
+  {dot:"#f027a4",text:"<strong>Marcus Rivera</strong> opened your email for the third time",time:"Just now"},
+  {dot:"#7c3aed",text:"<strong>Dev Patel</strong> clicked your case study link",time:"4m ago"},
+  {dot:"#00f5a0",text:"<strong>Zoe Park</strong> replied to your story reply",time:"12m ago"},
+  {dot:"#ffb400",text:"New lead <strong>Ryan Osei</strong> matched high-intent criteria",time:"31m ago"},
+  {dot:"#06d6f0",text:"<strong>Sarah Chen</strong> posted: 'Best AI tools for growth teams'",time:"1h ago"},
+  {dot:"#f97316",text:"Sequence <em>Cold Intro</em> hit 25% reply rate milestone",time:"2h ago"},
+  {dot:"#ec4899",text:"<strong>Maya Foster</strong> bookmarked your LinkedIn post",time:"3h ago"},
+  {dot:"#8b5cf6",text:"Weekly report: Reply rate up <strong>+4.2%</strong> vs last week",time:"4h ago"},
+];
+
+const FLOW_ITEMS = [
+  {id:"f1",title:"Follow up with Marcus Rivera — Day 3 email",due:"Today",done:false,lead:2},
+  {id:"f2",title:"Send Cold Intro to Jordan Kim",due:"Today",done:false,lead:4},
+  {id:"f3",title:"Review Sarah Chen's new post and engage",due:"Today",done:true,lead:1},
+  {id:"f4",title:"Soft Nudge: Carlos Mendez — final touch",due:"EOD",done:false,lead:9},
+  {id:"f5",title:"3 new high-signal prospects added to Radar",due:"Review",done:false,lead:null},
+];
+
+const RECENT_SENDS = [
+  {name:"Dev Patel",company:"Capsule",channel:"email",msg:"Hi Dev, wanted to share a quick win...",time:"2h ago",opened:true},
+  {name:"Zoe Park",company:"Flux",channel:"linkedin",msg:"Hey Zoe! Your content about product roadmaps...",time:"4h ago",opened:false},
+  {name:"Marcus Rivera",company:"Loop Labs",channel:"email",msg:"Hi Marcus, following up on my LinkedIn message...",time:"Yesterday",opened:true},
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  view: "deck",
+  y2k: false,
+  leads: JSON.parse(JSON.stringify(LEADS)),
+  sequences: JSON.parse(JSON.stringify(SEQUENCES)),
+  flow: JSON.parse(JSON.stringify(FLOW_ITEMS)),
+  linkedIn: false,
+  filters: { sig: "all", stage: "all", wave: "all" },
+  wqFilter: "all",
+  selectedSeq: 1,
+  studioLead: null,
+  studioTone: "professional",
+  studioChannel: "linkedin",
+  proofSelected: new Set(),
+  recentSends: [],
+};
+
+// ============================================================
+// ROUTER
+// ============================================================
+const VIEW_TITLES = {
+  deck: "⚡ Command Deck",
+  radar: "📡 Lead Radar",
+  lab: "🧪 Sequence Lab",
+  studio: "✍️ DM Studio",
+  queue: "🔥 Warm Queue",
+};
+
+function showView(name) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
+  document.getElementById("view-" + name).classList.add("active");
+  document.querySelector(`[data-view="${name}"]`).classList.add("active");
+  document.getElementById("pageTitle").textContent = VIEW_TITLES[name];
+  state.view = name;
+  renderView(name);
+}
+
+function renderView(name) {
+  if (name === "deck") renderCommandDeck();
+  else if (name === "radar") renderLeadRadar();
+  else if (name === "lab") renderSequenceLab();
+  else if (name === "studio") renderDMStudio();
+  else if (name === "queue") renderWarmQueue();
+}
+
+document.querySelectorAll(".nav-link").forEach(link => {
+  link.addEventListener("click", () => showView(link.dataset.view));
+});
+
+// ============================================================
+// COMMAND DECK
+// ============================================================
+function renderCommandDeck() {
+  renderKPIs();
+  renderFlow();
+  renderActivityFeed();
+  renderQuickChips();
+  renderPerfGrid();
+}
+
+function renderKPIs() {
+  const kpis = [
+    {label:"Messages Sent",value:"47",delta:"+12 today",up:true},
+    {label:"Reply Rate",value:"24%",delta:"+4.2% vs last week",up:true},
+    {label:"Warm Leads",value:"7",delta:"+3 this week",up:true},
+    {label:"Follow-ups Due",value:"5",delta:"2 overdue",up:false},
+  ];
+  document.getElementById("kpiGrid").innerHTML = kpis.map(k=>`
+    <div class="kpi-card">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-delta ${k.up?'':'down'}">${k.up?"▲":"▼"} ${k.delta}</div>
+    </div>
+  `).join("");
+}
+
+function renderFlow() {
+  document.getElementById("flowList").innerHTML = state.flow.map(item=>`
+    <div class="flow-item ${item.done?'done':''}" onclick="toggleFlow('${item.id}')">
+      <div class="flow-check">
+        <span class="flow-check-icon">✓</span>
+      </div>
+      <span class="flow-title">${item.title}</span>
+      <span class="flow-due">${item.due}</span>
+    </div>
+  `).join("");
+}
+
+function toggleFlow(id) {
+  const item = state.flow.find(f=>f.id===id);
+  if(item) { item.done = !item.done; renderFlow(); saveState(); }
+}
+
+function checkAllFlow() {
+  state.flow = state.flow.filter(f=>!f.done);
+  renderFlow();
+  saveState();
+  toast("Cleared completed items ✓");
+}
+
+function renderActivityFeed() {
+  document.getElementById("activityFeed").innerHTML = ACTIVITIES.map(a=>`
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${a.dot}"></div>
+      <div class="activity-text">${a.text}</div>
+      <div class="activity-time">${a.time}</div>
+    </div>
+  `).join("");
+}
+
+function renderQuickChips() {
+  document.getElementById("quickChips").innerHTML = SEQUENCES.map(s=>`
+    <div class="seq-chip" onclick="launchSequence(${s.id})" title="Launch ${s.name}">
+      <div class="seq-chip-dot" style="background:${s.color}"></div>
+      <span>${s.emoji} ${s.name}</span>
+      <span style="font-size:11px;color:var(--t2);margin-left:4px">${s.activeLeads} active</span>
+    </div>
+  `).join("");
+}
+
+function launchSequence(id) {
+  state.selectedSeq = id;
+  showView("lab");
+  toast("Sequence loaded in Sequence Lab");
+}
+
+function renderPerfGrid() {
+  const perf = [
+    {label:"Avg. Response Time",value:"2.3 days",sub:"vs 4.1 days industry avg",color:"#f027a4"},
+    {label:"Open Rate (Email)",value:"41%",sub:"↑ 6% from last week",color:"#7c3aed"},
+    {label:"Best Performing Seq.",value:"Creator Collab",sub:"31% reply rate",color:"#ffb400"},
+  ];
+  document.getElementById("perfGrid").innerHTML = perf.map(p=>`
+    <div class="card" style="border-top:2px solid ${p.color}">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:8px">${p.label}</div>
+      <div style="font-size:22px;font-weight:800;letter-spacing:-.5px;color:var(--t0);margin-bottom:4px">${p.value}</div>
+      <div style="font-size:12px;color:var(--t1)">${p.sub}</div>
+    </div>
+  `).join("");
+}
+
+// ============================================================
+// LEAD RADAR
+// ============================================================
+function renderLeadRadar() {
+  const q = document.getElementById("leadSearch")?.value?.toLowerCase()||"";
+  const {sig,stage,wave} = state.filters;
+  let leads = state.leads.filter(l=>{
+    if(q && !l.name.toLowerCase().includes(q) && !l.company.toLowerCase().includes(q)) return false;
+    if(sig==="high" && l.heat<70) return false;
+    if(sig==="mid" && (l.heat<40||l.heat>=70)) return false;
+    if(sig==="low" && l.heat>=40) return false;
+    if(stage==="none" && l.stage!=="none") return false;
+    if(stage==="active" && l.stage!=="active") return false;
+    if(wave!=="all" && l.wave!==parseInt(wave)) return false;
+    return true;
+  });
+  leads.sort((a,b)=>b.heat-a.heat);
+  const list = document.getElementById("leadList");
+  if(!leads.length){
+    list.innerHTML=`<div class="empty-state"><div class="empty-state-icon">📡</div><p>No leads match your filters.</p></div>`;
+    return;
+  }
+  list.innerHTML = leads.map(l=>renderLeadCard(l)).join("");
+}
+
+function renderLeadCard(l) {
+  const heatClass = l.heat>=80?"hot":l.heat>=55?"warm":"cool";
+  const waveCls = `wave-${l.wave}`;
+  const bars = Object.entries(l.signalScores).map(([k,v])=>`
+    <div class="signal-row">
+      <div class="signal-row-label">${k}</div>
+      <div class="heat-bar-wrap">
+        <div class="heat-bar ${heatClass}" style="width:${v}%"></div>
+      </div>
+      <span style="font-size:11px;font-variant-numeric:tabular-nums;color:var(--t1);width:28px">${v}</span>
+    </div>
+  `).join("");
+  const sigTags = [
+    l.signals.post?`<span class="signal-tag signal-post">📝 Post</span>`:"",
+    l.signals.hire&&!l.signals.hire.includes("No")?`<span class="signal-tag signal-hire">💼 Hiring</span>`:"",
+    l.signals.mutual&&!l.signals.mutual.includes("1 mutual")?`<span class="signal-tag signal-mutual">🔗 Mutual</span>`:"",
+    l.signals.eng&&!l.signals.eng.includes("No")?`<span class="signal-tag signal-eng">⚡ Engaged</span>`:"",
+  ].filter(Boolean).join("");
+  return `
+  <div class="lead-card" id="lc${l.id}">
+    <div>
+      <div class="lead-avatar" style="background:${l.color}">${l.name.split(" ").map(w=>w[0]).join("")}</div>
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div class="lead-name">${l.name}</div>
+        <span class="wave-badge ${waveCls}">Wave ${l.wave}</span>
+        ${l.stage==="active"?`<span style="font-size:11px;color:var(--gr);font-weight:600">● Active</span>`:""}
+      </div>
+      <div class="lead-meta">${l.title} · ${l.company}</div>
+      <div class="lead-signals" style="margin-top:6px">${sigTags}</div>
+      <div style="font-size:12px;color:var(--t2);margin-top:6px;font-style:italic">${l.signals.post}</div>
+      <div class="signal-bars">${bars}</div>
+      <div class="lead-actions">
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openInStudio(${l.id})">✍️ DM Studio</button>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();addLeadToSeq(${l.id})">+ Sequence</button>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showLeadProfile(${l.id})">💼 LinkedIn</button>
+      </div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div class="heat-score ${heatClass} ${heatClass==="hot"?"heat-pulse":""}">${l.heat}</div>
+      <div style="font-size:11px;color:var(--t2);margin-top:4px">Heat Score</div>
+    </div>
+  </div>`;
+}
+
+function setFilter(type, el) {
+  document.querySelectorAll(`[data-filter="${type}"]`).forEach(e=>e.classList.remove("on"));
+  el.classList.add("on");
+  state.filters[type] = el.dataset.val;
+  renderLeadRadar();
+}
+
+function filterLeads() { renderLeadRadar(); }
+
+function openInStudio(id) {
+  state.studioLead = id;
+  showView("studio");
+  setTimeout(()=>{
+    document.getElementById("studioLeadPicker").value = id;
+    updateStudio();
+  },50);
+}
+
+function addLeadToSeq(id) {
+  const lead = state.leads.find(l=>l.id===id);
+  toast(`${lead.name} added to Cold Intro sequence`);
+  lead.stage = "active";
+  lead.seqId = 1;
+  saveState();
+}
+
+function showLeadProfile(id) {
+  const lead = state.leads.find(l=>l.id===id);
+  const url = lead.linkedinUrl
+    || `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(lead.name+' '+(lead.company||''))}`;
+  window.open(url, '_blank');
+  toast(`Opening ${lead.name} on LinkedIn`);
+}
+
+// ============================================================
+// SEQUENCE LAB
+// ============================================================
+function renderSequenceLab() {
+  renderSeqList();
+  renderSeqDetail();
+}
+
+function renderSeqList() {
+  document.getElementById("seqList").innerHTML = state.sequences.map(s=>`
+    <div class="seq-card ${state.selectedSeq===s.id?"active-seq":""}" onclick="selectSeq(${s.id})" style="border-left-color:${state.selectedSeq===s.id?s.color:"transparent"}">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px">${s.emoji}</span>
+        <div>
+          <div class="seq-name">${s.name}</div>
+          <div style="font-size:12px;color:var(--t1)">${s.desc}</div>
+        </div>
+      </div>
+      <div class="seq-stats">
+        <div><span class="seq-stat-val">${s.steps.length}</span> steps</div>
+        <div><span class="seq-stat-val">${s.activeLeads}</span> active</div>
+        <div><span class="seq-stat-val">${s.replyRate}%</span> reply rate</div>
+        <div><span class="seq-stat-val">${s.sent}</span> sent</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function selectSeq(id) {
+  state.selectedSeq = id;
+  renderSeqList();
+  renderSeqDetail();
+}
+
+function renderSeqDetail() {
+  const s = state.sequences.find(x=>x.id===state.selectedSeq);
+  if(!s){document.getElementById("seqDetail").innerHTML="";return;}
+  const steps = s.steps.map((step,i)=>`
+    <div class="seq-step">
+      <div class="seq-step-dot"></div>
+      <div class="seq-step-card">
+        <div class="step-meta">
+          <span class="step-day">Day ${step.day}</span>
+          <span class="step-channel ${step.channel}">${step.channel==="email"?"📧 Email":"💼 LinkedIn"}</span>
+          ${step.subject?`<span style="font-size:11px;color:var(--t1)">Subject: <em>${step.subject}</em></span>`:""}
+          <span style="margin-left:auto;font-size:11px;color:var(--t2)">#${i+1}</span>
+        </div>
+        <div class="step-preview">${step.body}</div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn btn-ghost btn-sm" onclick="editStep(${s.id},${i})">✏️ Edit</button>
+          <button class="btn btn-ghost btn-sm" onclick="deleteStep(${s.id},${i})">🗑 Remove</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+  document.getElementById("seqDetail").innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:24px">${s.emoji}</span>
+          <div>
+            <div style="font-size:17px;font-weight:700">${s.name}</div>
+            <div style="font-size:12px;color:var(--t1)">${s.desc}</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="addStep(${s.id})">+ Add Step</button>
+        <button class="btn btn-primary btn-sm" onclick="activateSeq(${s.id})">▶ Activate Sequence</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:20px;margin-bottom:24px;flex-wrap:wrap">
+      <div class="card" style="flex:1;min-width:120px;padding:14px 16px;border-top:2px solid ${s.color}">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:6px">Reply Rate</div>
+        <div style="font-size:26px;font-weight:800;color:var(--t0)">${s.replyRate}%</div>
+      </div>
+      <div class="card" style="flex:1;min-width:120px;padding:14px 16px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:6px">Active Leads</div>
+        <div style="font-size:26px;font-weight:800;color:var(--t0)">${s.activeLeads}</div>
+      </div>
+      <div class="card" style="flex:1;min-width:120px;padding:14px 16px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:6px">Total Sent</div>
+        <div style="font-size:26px;font-weight:800;color:var(--t0)">${s.sent}</div>
+      </div>
+    </div>
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:16px">Sequence Steps</div>
+    <div class="seq-timeline">${steps}</div>
+  `;
+}
+
+function addStep(seqId) {
+  const s = state.sequences.find(x=>x.id===seqId);
+  const lastDay = s.steps.length?s.steps[s.steps.length-1].day+4:0;
+  s.steps.push({day:lastDay,channel:"linkedin",subject:null,body:"New step — click Edit to customize this message."});
+  renderSeqDetail();
+  saveState();
+  toast("Step added to sequence");
+}
+
+function deleteStep(seqId,idx) {
+  const s = state.sequences.find(x=>x.id===seqId);
+  s.steps.splice(idx,1);
+  renderSeqDetail();
+  saveState();
+  toast("Step removed");
+}
+
+function editStep(seqId,idx) {
+  const s = state.sequences.find(x=>x.id===seqId);
+  const step = s.steps[idx];
+  const newBody = prompt("Edit step message:", step.body);
+  if(newBody!==null){ step.body=newBody; renderSeqDetail(); saveState(); }
+}
+
+function activateSeq(id) {
+  toast("Sequence activated! Leads will enter automatically ✓");
+}
+
+function newSequence() {
+  const name = prompt("New sequence name:");
+  if(!name) return;
+  const id = state.sequences.length+1;
+  state.sequences.push({id,name,color:"#06d6f0",emoji:"⭐",desc:"Custom sequence",steps:[],activeLeads:0,replyRate:0,sent:0});
+  state.selectedSeq = id;
+  renderSequenceLab();
+  saveState();
+  toast(`Sequence "${name}" created`);
+}
+
+// ============================================================
+// DM STUDIO
+// ============================================================
+function renderDMStudio() {
+  // populate lead picker
+  const picker = document.getElementById("studioLeadPicker");
+  picker.innerHTML = '<option value="">— Choose a lead —</option>' +
+    state.leads.map(l=>`<option value="${l.id}">${l.name} · ${l.company}</option>`).join("");
+  if(state.studioLead) { picker.value = state.studioLead; updateStudio(); }
+  renderProofPoints();
+  renderRecentSends();
+}
+
+function renderProofPoints() {
+  document.getElementById("proofPoints").innerHTML = PROOF_POINTS.map((p,i)=>`
+    <div class="proof-point ${state.proofSelected.has(i)?"selected":""}" onclick="toggleProof(${i})">
+      <span class="proof-icon">${p.icon}</span>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--t0);margin-bottom:2px">${p.label}</div>
+        <p>${p.body}</p>
+      </div>
+    </div>
+  `).join("");
+}
+
+function toggleProof(i) {
+  if(state.proofSelected.has(i)) state.proofSelected.delete(i);
+  else state.proofSelected.add(i);
+  renderProofPoints();
+}
+
+function updateStudio() {
+  state.studioLead = parseInt(document.getElementById("studioLeadPicker").value)||null;
+  const lead = state.leads.find(l=>l.id===state.studioLead);
+  const signalsEl = document.getElementById("studioLeadSignals");
+  if(!lead){ signalsEl.innerHTML=""; return; }
+  signalsEl.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      ${Object.entries(lead.signals).map(([k,v])=>`
+        <div style="background:var(--glass);border:1px solid var(--gb);border-radius:var(--rs);padding:8px 10px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin-bottom:3px">${k}</div>
+          <div style="font-size:12px;color:var(--t0)">${v}</div>
+        </div>
+      `).join("")}
+    </div>
+    <div style="margin-top:12px;display:flex;align-items:center;gap:8px">
+      <div class="lead-avatar" style="background:${lead.color};width:32px;height:32px;font-size:12px">${lead.name.split(" ").map(w=>w[0]).join("")}</div>
+      <div>
+        <div style="font-size:13px;font-weight:700">${lead.name}</div>
+        <div style="font-size:11px;color:var(--t1)">${lead.title} · ${lead.company}</div>
+      </div>
+      <div class="heat-score ${lead.heat>=80?"hot":lead.heat>=55?"warm":"cool"}" style="font-size:18px;margin-left:auto">${lead.heat}</div>
+    </div>
+  `;
+}
+
+function setTone(el) {
+  document.querySelectorAll(".tone-btn").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");
+  state.studioTone = el.dataset.tone;
+  if(state.studioLead) generateMessage();
+}
+
+function generateMessage() {
+  const lead = state.leads.find(l=>l.id===state.studioLead);
+  if(!lead){ toast("Select a lead first"); return; }
+  const channel = document.getElementById("channelPicker").value;
+  const tone = state.studioTone;
+  const topic = lead.signals.post.split(" ").slice(0,5).join(" ");
+  const proofs = Array.from(state.proofSelected).map(i=>PROOF_POINTS[i].body).join(" ");
+
+  const messages = {
+    professional: {
+      linkedin:`Hi ${lead.name}, your recent post on ${topic} caught my attention — really resonated with the work we're doing at [Your Company]. Given your role at ${lead.company}, I think there's a meaningful conversation to be had. Would you be open to a 15-minute call this week?${proofs?" Here's some context: "+proofs.substring(0,120)+"...":""}`,
+      email:`Subject: Quick note re: ${lead.company}\n\nHi ${lead.name},\n\nI came across your work at ${lead.company} and was impressed by ${topic}. We've been working with teams in a similar space — ${proofs||"helping them achieve measurable results in 90 days"}.\n\nWorth a quick 15-minute call to explore?\n\nBest,\n[Your Name]`,
+    },
+    casual: {
+      linkedin:`Hey ${lead.name}! Saw your post about ${topic} — honestly great stuff. We've been experimenting with something similar at [Your Company] with some wild results. Would love to swap notes sometime?${proofs?" Quick context: "+proofs.substring(0,100)+"...":""}`,
+      email:`Subject: Hey ${lead.name} — quick one\n\nHey!\n\nLoved your recent content on ${topic}. We're doing something parallel at [Your Company] — ${proofs||"and the results have been pretty surprising"}.\n\nGrab 20 minutes to chat?\n\n[Your Name]`,
+    },
+    direct: {
+      linkedin:`${lead.name} — your work at ${lead.company} is exactly the profile we work with. We help [ICP] achieve [outcome] in [timeframe]. ${proofs?proofs.substring(0,100)+"... ":""}15 minutes to see if it's relevant?`,
+      email:`Subject: ${lead.company} + [Your Company]\n\nHi ${lead.name},\n\n${proofs||"We help teams like yours achieve X in Y days"}.\n\n${lead.company} fits the exact profile. 15 minutes?\n\n[Your Name]`,
+    },
+    playful: {
+      linkedin:`Hey ${lead.name} 👋 Your post on ${topic} made me do a double take — we're literally building something for that problem. No hard pitch, just think there's a fun conversation here. Thoughts?`,
+      email:`Subject: Okay hear me out, ${lead.name} 😄\n\nHi ${lead.name},\n\nSaw your recent content on ${topic} and thought: "this person gets it."\n\nWe've been quietly helping teams do [thing] in a new way. ${proofs||"The results have been unexpectedly wild."}\n\nWanna compare notes? (No decks, I promise)\n\n[Your Name]`,
+    },
+  };
+  const msg = (messages[tone]||messages.professional)[channel]||messages[tone].linkedin;
+  document.getElementById("msgEditor").value = msg;
+  updateCharCount();
+}
+
+function updateCharCount() {
+  const val = document.getElementById("msgEditor").value;
+  const el = document.getElementById("charCount");
+  const lim = document.getElementById("channelPicker").value==="linkedin"?300:1000;
+  el.textContent = `${val.length} / ${lim} characters`;
+  el.classList.toggle("over", val.length>lim);
+}
+
+function copyMessage() {
+  const text = document.getElementById("msgEditor").value;
+  if(!text){toast("Nothing to copy"); return;}
+  navigator.clipboard.writeText(text).then(()=>toast("Message copied to clipboard ✓"));
+}
+
+function addToSequence() {
+  toast("Message added to Cold Intro sequence ✓");
+}
+
+function sendOnLinkedIn() {
+  const lead = state.leads.find(l=>l.id===state.studioLead);
+  if(!lead){toast("Select a lead first"); return;}
+  const text = document.getElementById("msgEditor").value;
+  if(!text){toast("Write or generate a message first"); return;}
+  const url = lead.linkedinUrl
+    || `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(lead.name+' '+(lead.company||''))}`;
+  navigator.clipboard.writeText(text).then(()=>{
+    window.open(url, '_blank');
+    toast("Message copied! Opening LinkedIn — paste it and hit Send 💼");
+  }).catch(()=>{
+    window.open(url, '_blank');
+    toast("Opening LinkedIn — copy your message manually then paste it");
+  });
+  // log the send and schedule a follow-up task
+  const channel = document.getElementById("channelPicker").value;
+  state.recentSends = state.recentSends || [];
+  state.recentSends.unshift({name:lead.name,company:lead.company,channel,msg:text.substring(0,80)+"...",time:"Just now",opened:false});
+  state.flow.push({id:'f'+Date.now(),title:`Follow up with ${lead.name} — Day 3`,due:'In 3 days',done:false,lead:lead.id});
+  saveState();
+  renderRecentSends();
+}
+
+function renderRecentSends() {
+  const sends = (state.recentSends && state.recentSends.length) ? state.recentSends : RECENT_SENDS;
+  const el = document.getElementById("recentSends");
+  if(!el) return;
+  el.innerHTML = sends.slice(0,5).map(s=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gb)">
+      <span style="font-size:16px">${s.channel==="email"?"📧":"💼"}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--t0)">${s.name} · <span style="color:var(--t1)">${s.company}</span></div>
+        <div style="font-size:11px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.msg}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:10px;color:var(--t2)">${s.time}</div>
+        ${s.opened?`<div style="font-size:10px;color:var(--gr);font-weight:600">Opened ✓</div>`:""}
+      </div>
+    </div>
+  `).join("") || `<div style="font-size:12px;color:var(--t2);text-align:center;padding:16px">No sends yet</div>`;
+}
+
+// ============================================================
+// WARM QUEUE
+// ============================================================
+function renderWarmQueue() {
+  let leads = [...state.leads].sort((a,b)=>b.heat-a.heat);
+  if(state.wqFilter==="hot") leads=leads.filter(l=>l.heat>=80);
+  else if(state.wqFilter==="warm") leads=leads.filter(l=>l.heat>=55&&l.heat<80);
+  else if(state.wqFilter==="promoted") leads=leads.filter(l=>l.heat>=85);
+
+  document.getElementById("warmQueue").innerHTML = leads.map(l=>{
+    const hc = l.heat>=80?"hot":l.heat>=55?"warm":"cool";
+    const events = l.events.length
+      ? l.events.map(e=>`<span class="wq-event"><span class="wq-event-icon">${e.icon}</span><span style="color:var(--t1)">${e.label}</span><span class="heat-change up">${e.delta}</span><span style="color:var(--t2);font-size:10px"> ${e.t}</span></span>`).join("")
+      : `<span style="color:var(--t2);font-size:12px">No recent signals — consider a re-engage</span>`;
+    return `
+    <div class="wq-card">
+      <div class="wq-row">
+        <div class="wq-heat-block">
+          <div class="heat-score ${hc} ${hc==="hot"?"heat-pulse":""}">${l.heat}</div>
+          <div class="wq-score-label">Heat</div>
+        </div>
+        <div class="lead-avatar" style="background:${l.color};width:40px;height:40px;font-size:13px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex-shrink:0">${l.name.split(" ").map(w=>w[0]).join("")}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:14px;font-weight:700;color:var(--t0)">${l.name}</span>
+            ${l.heat>=85?`<span class="promote-badge">⬆ Promote</span>`:""}
+            <span class="wave-badge wave-${l.wave}">Wave ${l.wave}</span>
+          </div>
+          <div style="font-size:12px;color:var(--t1)">${l.title} · ${l.company}</div>
+          <div style="margin-top:6px">
+            <div class="heat-bar-wrap" style="height:8px">
+              <div class="heat-bar ${hc}" style="width:${l.heat}%"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          <button class="btn btn-ghost btn-sm" onclick="openInStudio(${l.id})">✍️ DM</button>
+          <button class="btn btn-ghost btn-sm" onclick="archiveLead(${l.id})">Archive</button>
+        </div>
+      </div>
+      <div class="wq-activity">${events}</div>
+    </div>`;
+  }).join("");
+}
+
+function setWqFilter(val, el) {
+  document.querySelectorAll("[data-filter='wq']").forEach(e=>e.classList.remove("on"));
+  el.classList.add("on");
+  state.wqFilter = val;
+  renderWarmQueue();
+}
+
+function archiveLead(id) {
+  const lead = state.leads.find(l=>l.id===id);
+  toast(`${lead.name} archived from Warm Queue`);
+  lead.heat = Math.max(lead.heat-20,10);
+  renderWarmQueue();
+  saveState();
+}
+
+// ============================================================
+// LINKEDIN — REAL CSV IMPORT
+// ============================================================
+function openLinkedIn() {
+  document.getElementById("liModal").classList.add("open");
+  document.getElementById("liModalContent").innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <div style="width:36px;height:36px;background:#0077b5;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:18px;flex-shrink:0">in</div>
+      <div>
+        <div style="font-size:16px;font-weight:700;color:var(--t0)">Import LinkedIn Connections</div>
+        <div style="font-size:12px;color:var(--t1)">Your real contacts, directly into Lead Radar</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,119,181,.08);border:1px solid rgba(0,119,181,.25);border-radius:var(--r);padding:14px 16px;margin-bottom:20px">
+      <div style="font-size:12px;font-weight:700;color:var(--cy);margin-bottom:8px">📋 How to get your connections CSV</div>
+      <ol style="font-size:12px;color:var(--t1);padding-left:18px;line-height:2">
+        <li>Go to <strong style="color:var(--t0)">linkedin.com</strong> → click your profile photo → <strong style="color:var(--t0)">Settings &amp; Privacy</strong></li>
+        <li>Click <strong style="color:var(--t0)">Data Privacy</strong> → <strong style="color:var(--t0)">Get a copy of your data</strong></li>
+        <li>Select <strong style="color:var(--t0)">Connections</strong> → click <strong style="color:var(--t0)">Request Archive</strong></li>
+        <li>LinkedIn emails you a download link (usually within 10 minutes)</li>
+        <li>Download and unzip — you want <strong style="color:var(--t0)">Connections.csv</strong></li>
+      </ol>
+      <a href="https://www.linkedin.com/psettings/member-data" target="_blank" style="display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:12px;color:var(--cy);text-decoration:none">
+        Open LinkedIn Data Settings →
+      </a>
+    </div>
+
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:8px">Upload Connections.csv</div>
+      <label style="display:flex;align-items:center;justify-content:center;gap:8px;border:2px dashed var(--gb);border-radius:var(--r);padding:20px;cursor:pointer;transition:all .2s;font-size:13px;color:var(--t1)" id="csvDropZone">
+        <span style="font-size:20px">📁</span> Click to choose Connections.csv
+        <input type="file" accept=".csv,.txt" id="csvFileInput" style="display:none" onchange="importLinkedInCSV(this)">
+      </label>
+    </div>
+
+    <div style="text-align:center;font-size:11px;color:var(--t2)">All data stays local in your browser — nothing is uploaded anywhere</div>
+  `;
+  // hover effect on drop zone
+  const zone = document.getElementById("csvDropZone");
+  if(zone){
+    zone.addEventListener("click",()=>document.getElementById("csvFileInput").click());
+    zone.addEventListener("dragover",e=>{e.preventDefault();zone.style.borderColor="var(--mag)"});
+    zone.addEventListener("dragleave",()=>zone.style.borderColor="var(--gb)");
+    zone.addEventListener("drop",e=>{
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      if(file) processCSV(file);
+    });
+  }
+}
+
+function closeLinkedIn() {
+  document.getElementById("liModal").classList.remove("open");
+}
+
+function importLinkedInCSV(input) {
+  const file = input.files[0];
+  if(file) processCSV(file);
+}
+
+function processCSV(file) {
+  document.getElementById("liModalContent").innerHTML = `
+    <div class="li-sync-status">
+      <div style="font-size:28px;margin-bottom:12px">⚙️</div>
+      <div style="font-size:15px;font-weight:700;color:var(--t0);margin-bottom:6px">Parsing connections...</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="syncBar" style="width:60%"></div></div>
+      <div style="font-size:12px;color:var(--t1)">Reading ${file.name}</div>
+    </div>`;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const text = e.target.result;
+    // LinkedIn CSV can start with notes/blank lines before headers
+    const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+    // Find the header row (contains "First Name")
+    let headerIdx = lines.findIndex(l => /first.?name/i.test(l));
+    if(headerIdx === -1) headerIdx = 0;
+    const headers = parseCSVLine(lines[headerIdx]).map(h=>h.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z_]/g,''));
+    const fni = headers.findIndex(h=>h.includes('first'));
+    const lni = headers.findIndex(h=>h.includes('last'));
+    const emi = headers.findIndex(h=>h.includes('email'));
+    const coi = headers.findIndex(h=>h.includes('company'));
+    const poi = headers.findIndex(h=>h.includes('position'));
+    const cni = headers.findIndex(h=>h.includes('connected'));
+
+    const colors = ["#f027a4","#7c3aed","#06d6f0","#00f5a0","#ffb400","#f97316","#ec4899","#8b5cf6","#14b8a6","#f43f5e","#6366f1","#10b981"];
+    let added = 0;
+    const newLeads = [];
+
+    lines.slice(headerIdx + 1).forEach(line => {
+      if(!line) return;
+      const cols = parseCSVLine(line);
+      const firstName = (fni>=0 ? cols[fni] : '') || '';
+      const lastName  = (lni>=0 ? cols[lni] : '') || '';
+      const email     = (emi>=0 ? cols[emi] : '') || '';
+      const company   = (coi>=0 ? cols[coi] : '') || '';
+      const position  = (poi>=0 ? cols[poi] : '') || '';
+      const connected = (cni>=0 ? cols[cni] : '') || '';
+      const name = `${firstName} ${lastName}`.trim();
+      if(!name || name.length < 2) return;
+      if(state.leads.find(l=>l.name.toLowerCase()===name.toLowerCase())) return;
+      const id = Date.now() + added;
+      const heat = Math.floor(40 + Math.random()*35);
+      const lead = {
+        id, name,
+        title: position || 'LinkedIn Connection',
+        company: company || '—',
+        color: colors[added % colors.length],
+        heat,
+        wave: 2,
+        stage: 'none',
+        seqId: null,
+        email: email || null,
+        linkedinUrl: `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(name+(company?' '+company:''))}`,
+        signals: {
+          post: connected ? `Connected on LinkedIn (${connected})` : 'LinkedIn connection',
+          hire: 'Check their profile for hiring signals',
+          mutual: 'From your LinkedIn network',
+          eng: email ? `✉ ${email}` : 'No email on record'
+        },
+        signalScores: {
+          activity: Math.floor(35+Math.random()*40),
+          hiring:   Math.floor(15+Math.random()*50),
+          mutual:   Math.floor(50+Math.random()*45),
+          engagement: Math.floor(25+Math.random()*45)
+        },
+        events: []
+      };
+      state.leads.push(lead);
+      newLeads.push(lead);
+      added++;
+    });
+
+    saveState();
+    setLinkedInConnected(added);
+
+    document.getElementById("liModalContent").innerHTML = `
+      <div class="li-sync-status">
+        <div style="font-size:48px;margin-bottom:12px">🎉</div>
+        <div style="font-size:16px;font-weight:700;color:var(--t0);margin-bottom:6px">${added} connections imported!</div>
+        <div style="font-size:13px;color:var(--t1);margin-bottom:20px">All ranked by heat score and ready in Lead Radar</div>
+        <div style="max-height:200px;overflow-y:auto;margin-bottom:16px">
+          ${newLeads.slice(0,8).map(l=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--gb)">
+              <div style="width:30px;height:30px;border-radius:50%;background:${l.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${l.name.split(' ').map(w=>w[0]).join('')}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.name}</div>
+                <div style="font-size:11px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.title}${l.company&&l.company!=='—'?' · '+l.company:''}</div>
+              </div>
+              <div class="heat-score ${l.heat>=70?'warm':'cool'}" style="font-size:15px">${l.heat}</div>
+            </div>`).join('')}
+          ${added>8?`<div style="font-size:11px;color:var(--t2);text-align:center;padding:8px">+ ${added-8} more</div>`:''}
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="closeLinkedIn();showView('radar')">View all in Lead Radar →</button>
+      </div>`;
+    document.getElementById("badge-radar").textContent = state.leads.length;
+    toast(`${added} LinkedIn connections imported ✓`);
+  };
+  reader.onerror = () => {
+    toast("Couldn't read that file — make sure it's a CSV");
+    openLinkedIn();
+  };
+  reader.readAsText(file);
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for(let i=0;i<line.length;i++){
+    const c = line[i];
+    if(c==='"'){ inQ=!inQ; }
+    else if(c===','&&!inQ){ result.push(cur.trim()); cur=''; }
+    else { cur+=c; }
+  }
+  result.push(cur.trim());
+  return result;
+}
+
+function setLinkedInConnected(count) {
+  state.linkedIn = true;
+  document.getElementById("liDot").classList.add("connected");
+  document.getElementById("liTitle").textContent = "LinkedIn ✓";
+  document.getElementById("liSub").textContent = count ? `${count} contacts imported` : "Connected";
+  document.getElementById("liBtn").textContent = "Re-import CSV";
+  saveState();
+}
+
+// ============================================================
+// Y2K MODE
+// ============================================================
+function toggleY2K() {
+  state.y2k = !state.y2k;
+  document.body.classList.toggle("y2k", state.y2k);
+  const btn = document.getElementById("y2kBtn");
+  btn.textContent = state.y2k ? "✕ Exit Y2K" : "✦ Y2K Mode";
+  if(state.y2k) buildStars();
+  else document.getElementById("y2kStars").innerHTML="";
+}
+
+function buildStars() {
+  const container = document.getElementById("y2kStars");
+  const symbols = ["✦","✧","★","✸","✺","·","⁺"];
+  let html = "";
+  for(let i=0;i<80;i++){
+    const sym = symbols[Math.floor(Math.random()*symbols.length)];
+    const x = Math.random()*100;
+    const y = Math.random()*100;
+    const delay = Math.random()*3;
+    const dur = 1.5+Math.random()*2;
+    const size = 8+Math.random()*12;
+    const colors = ["#ff00ff","#00ffff","#ffff00","#00ff00","#ff6600","#ffffff"];
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    html += `<span style="left:${x}%;top:${y}%;font-size:${size}px;color:${color};animation-delay:${delay}s;animation-duration:${dur}s">${sym}</span>`;
+  }
+  container.innerHTML = html;
+}
+
+// ============================================================
+// HEAT SIMULATION
+// ============================================================
+const heatEvents = [
+  {icon:"👁",label:"Viewed your profile",delta:"+6"},
+  {icon:"📧",label:"Opened your email",delta:"+10"},
+  {icon:"🔗",label:"Clicked your link",delta:"+8"},
+  {icon:"💬",label:"Commented on post",delta:"+12"},
+  {icon:"❤️",label:"Liked your content",delta:"+5"},
+  {icon:"🔄",label:"Reshared your post",delta:"+14"},
+];
+
+function simulateHeat() {
+  const warmLeads = state.leads.filter(l=>l.heat>=60);
+  if(!warmLeads.length) return;
+  const lead = warmLeads[Math.floor(Math.random()*warmLeads.length)];
+  const ev = heatEvents[Math.floor(Math.random()*heatEvents.length)];
+  const bump = parseInt(ev.delta.replace("+",""));
+  lead.heat = Math.min(lead.heat+bump, 99);
+  const newEvent = {...ev, t:"Just now"};
+  lead.events.unshift(newEvent);
+  if(lead.events.length>4) lead.events.pop();
+  if(state.view==="queue") renderWarmQueue();
+  if(state.view==="radar") renderLeadRadar();
+  // Update live activity feed
+  const actFeed = document.getElementById("activityFeed");
+  if(actFeed && state.view==="deck") {
+    const colors = ["#f027a4","#7c3aed","#06d6f0","#00f5a0","#ffb400","#f97316"];
+    const c = colors[Math.floor(Math.random()*colors.length)];
+    const newRow = `<div class="activity-item"><div class="activity-dot" style="background:${c}"></div><div class="activity-text"><strong>${lead.name}</strong> ${ev.label.toLowerCase()}</div><div class="activity-time">Just now</div></div>`;
+    actFeed.innerHTML = newRow + actFeed.innerHTML.split('<div class="activity-item">').slice(0,7).map((s,i)=>i===0?"":('<div class="activity-item">'+s)).join("");
+  }
+}
+
+// ============================================================
+// PERSISTENCE
+// ============================================================
+function saveState() {
+  try {
+    localStorage.setItem('oos_leads',      JSON.stringify(state.leads));
+    localStorage.setItem('oos_flow',       JSON.stringify(state.flow));
+    localStorage.setItem('oos_sequences',  JSON.stringify(state.sequences));
+    localStorage.setItem('oos_sends',      JSON.stringify(state.recentSends||[]));
+    localStorage.setItem('oos_linkedin',   state.linkedIn ? '1' : '0');
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const leads = localStorage.getItem('oos_leads');
+    if(leads) state.leads = JSON.parse(leads);
+
+    const flow = localStorage.getItem('oos_flow');
+    if(flow) state.flow = JSON.parse(flow);
+
+    const seqs = localStorage.getItem('oos_sequences');
+    if(seqs) state.sequences = JSON.parse(seqs);
+
+    const sends = localStorage.getItem('oos_sends');
+    if(sends) state.recentSends = JSON.parse(sends);
+
+    if(localStorage.getItem('oos_linkedin') === '1') {
+      state.linkedIn = true;
+      const count = state.leads.length - LEADS.length;
+      document.getElementById("liDot").classList.add("connected");
+      document.getElementById("liTitle").textContent = "LinkedIn ✓";
+      document.getElementById("liSub").textContent = count > 0 ? `${count} contacts imported` : "Connected";
+      document.getElementById("liBtn").textContent = "Re-import CSV";
+    }
+  } catch(e) {}
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 2800);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  loadState();
+  renderCommandDeck();
+  setInterval(simulateHeat, 6000);
+}
+
+init();
+</script>
+</body>
+</html>
